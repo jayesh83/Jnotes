@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.sp
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.navigationBarsPadding
 import com.jayesh.jnotes.R
+import com.jayesh.jnotes.ui.clearFocusOnKeyboardDismiss
 import com.jayesh.jnotes.ui.theme.Orange500
 import kotlinx.coroutines.delay
 
@@ -258,6 +259,7 @@ fun NoteTextField(
     backgroundColor: Color = Color.Transparent,
     contentColor: Color = MaterialTheme.colors.onBackground,
     shouldPadToNavigationBars: Boolean = false,
+    onSoftKeyboardDismissed: (() -> Unit)? = null
 ) {
     val focusRequester = remember { FocusRequester() }
 
@@ -279,7 +281,7 @@ fun NoteTextField(
 
     if (currentIsFocused) {
         LaunchedEffect(key1 = currentIsFocused) {
-            delay(300)
+            delay(200)
             focusRequester.requestFocus()
         }
     }
@@ -297,7 +299,8 @@ fun NoteTextField(
                 )
                 .fillMaxSize()
                 .focusRequester(focusRequester)
-                .onFocusChanged { currentFocusChanged(it) },
+                .onFocusChanged { currentFocusChanged(it) }
+                .clearFocusOnKeyboardDismiss(onSoftKeyboardDismissed),
             textStyle = commonTextStyle,
             cursorBrush = SolidColor(MaterialTheme.colors.onSurface),
             keyboardOptions = KeyboardOptions(

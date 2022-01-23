@@ -135,6 +135,9 @@ fun NewOrEditNoteScreen(
                     },
                     contentColor = viewmodel.selectedBackgroundType.contentColor,
                     shouldPadToNavigationBars = viewmodel.noteBackgroundChangerBottomSheetVisible,
+                    onSoftKeyboardDismissed = {
+                        viewmodel.setCurrentlyEditingState(None)
+                    }
                 )
             }
             if (viewmodel.noteBackgroundChangerBottomSheetVisible) {
