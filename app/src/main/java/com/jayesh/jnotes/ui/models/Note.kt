@@ -12,7 +12,10 @@ data class Note(
     val config: NoteConfig = NoteConfig.DEFAULT,
     val lastEdit: Long = System.currentTimeMillis(),
     val createdAt: Long = System.currentTimeMillis()
-)
+) {
+    val isTitleTextEmpty get() = title.isBlank()
+    val isContentTextEmpty get() = content.text.isBlank()
+}
 
 /** Note can contain text, picture, video, drawing, voice recording, etc  **/
 data class NoteContent(
