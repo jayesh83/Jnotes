@@ -1,6 +1,8 @@
 plugins {
   id 'com.android.application'
   id 'kotlin-android'
+  id 'dagger.hilt.android.plugin'
+  id 'kotlin-kapt'
 }
 
 android {
@@ -47,10 +49,18 @@ android {
 }
 
 dependencies {
+  // hilt
+  implementation "com.google.dagger:hilt-android:2.39"
+  implementation 'androidx.hilt:hilt-navigation-compose:1.0.0-rc01'
+  kapt "com.google.dagger:hilt-compiler:2.39"
+  // compose,hilt navigation
+  implementation "androidx.navigation:navigation-compose:2.4.0-rc01"
+  implementation 'androidx.hilt:hilt-navigation-compose:1.0.0-rc01'
+
   implementation 'org.bitbucket.cowwoc:diff-match-patch:1.2'
   implementation 'androidx.core:core-ktx:1.7.0'
-  implementation 'androidx.appcompat:appcompat:1.4.0'
-  implementation 'com.google.android.material:material:1.4.0'
+  implementation 'androidx.appcompat:appcompat:1.4.1'
+  implementation 'com.google.android.material:material:1.5.0'
   implementation "androidx.compose.ui:ui:$compose_version"
   implementation "androidx.compose.material:material:$compose_version"
   implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"

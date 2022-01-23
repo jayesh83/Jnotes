@@ -1,6 +1,5 @@
-package com.jayesh.jnotes.ui
+package com.jayesh.jnotes.ui.newOrEditNote
 
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -8,7 +7,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -44,7 +42,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusRequester
@@ -52,139 +49,19 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.navigationBarsPadding
-import com.google.accompanist.insets.statusBarsPadding
 import com.jayesh.jnotes.R
-import com.jayesh.jnotes.ui.BackgroundType.SingleColor
-import com.jayesh.jnotes.ui.CurrentlyEditing.None
-import com.jayesh.jnotes.ui.CurrentlyEditing.Note
-import com.jayesh.jnotes.ui.CurrentlyEditing.Title
-import com.jayesh.jnotes.ui.theme.BlackMuted
-import com.jayesh.jnotes.ui.theme.Blue200
-import com.jayesh.jnotes.ui.theme.Blue500
-import com.jayesh.jnotes.ui.theme.Green200
-import com.jayesh.jnotes.ui.theme.Green500
-import com.jayesh.jnotes.ui.theme.Grey200
-import com.jayesh.jnotes.ui.theme.Grey500
 import com.jayesh.jnotes.ui.theme.Orange500
-import com.jayesh.jnotes.ui.theme.Parrot200
-import com.jayesh.jnotes.ui.theme.Parrot500
-import com.jayesh.jnotes.ui.theme.Pink200
-import com.jayesh.jnotes.ui.theme.Pink500
-import com.jayesh.jnotes.ui.theme.WhiteMutated
-
-private const val TAG = "NewOrEditNote"
-
-// TODO: 04/01/22 scroll title along with note
-// FIXME: 04/01/22 textfield text below keyboard
-
-@Composable
-fun NewOrEditNote(viewmodel: NewOrEditNoteViewmodel = viewModel()) {
-    val focusManager = LocalFocusManager.current
-    val dispatcher = LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
-
-    Column(
-        modifier = Modifier
-            .background(viewmodel.selectedBackgroundType.backgroundColor)
-            .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding(
-                start = true,
-                end = true,
-                bottom = false
-            ) // when in landscape mode, apply end edge navigation bar padding
-    ) {
-        when (viewmodel.currentlyEditing) {
-            Title -> {
-                TopAppBarWhenEditingTitle(
-                    onBack = { dispatcher.onBackPressed() },
-                    onEditingComplete = {
-                        setEditingComplete(viewmodel, focusManager)
-                    },
-                    contentColor = viewmodel.selectedBackgroundType.contentColor
-                )
-            }
-            Note -> {
-                TopAppBarWhenEditingContent(
-                    onBack = { dispatcher.onBackPressed() },
-                    enableUndo = viewmodel.enableUndo,
-                    onUndo = viewmodel::undo,
-                    enableRedo = viewmodel.enableRedo,
-                    onRedo = viewmodel::redo,
-                    onEditingComplete = {
-                        setEditingComplete(viewmodel, focusManager)
-                    },
-                    contentColor = viewmodel.selectedBackgroundType.contentColor
-                )
-            }
-            None -> {
-                TopAppBarWhenEditingNone(
-                    onBack = { dispatcher.onBackPressed() },
-                    onShare = {},
-                    onChangeNoteBackground = viewmodel::toggleNoteBackgroundChangerState,
-                    contentColor = viewmodel.selectedBackgroundType.contentColor
-                )
-            }
-        }
-        Box {
-            Column(
-                modifier = Modifier.align(Alignment.TopStart)
-            ) {
-                TitleTextField(
-                    textFieldValue = viewmodel.titleTextFieldState,
-                    onTitleChange = viewmodel::setOnTitleChange,
-                    isFocused = viewmodel.currentlyEditing == Title,
-                    onFocusChanged = {
-                        if (it.isFocused) {
-                            viewmodel.setCurrentlyEditingState(Title)
-                        }
-                    },
-                    contentColor = viewmodel.selectedBackgroundType.contentColor
-                )
-                NoteTextField(
-                    textFieldValue = viewmodel.noteTextFieldState,
-                    onNoteChange = viewmodel::setOnNoteChange,
-                    isFocused = viewmodel.currentlyEditing == Note,
-                    onFocusChanged = {
-                        if (it.isFocused) {
-                            viewmodel.setCurrentlyEditingState(Note)
-                        }
-                    },
-                    contentColor = viewmodel.selectedBackgroundType.contentColor,
-                    shouldPadToNavigationBars = viewmodel.bottomSheetNoteBackgroundChangerVisible,
-                )
-            }
-            if (viewmodel.bottomSheetNoteBackgroundChangerVisible) {
-                BottomSheetNoteBackgroundChanger(
-                    modifier = Modifier.align(Alignment.BottomCenter),
-                    selectedBackground = viewmodel.selectedBackgroundType,
-                    onBackgroundSelected = viewmodel::setOnBackgroundChange,
-                    backgroundList = viewmodel.availableSingleColorBackgrounds()
-                )
-            }
-        }
-    }
-}
-
-private fun setEditingComplete(
-    viewmodel: NewOrEditNoteViewmodel,
-    focusManager: FocusManager
-) {
-    viewmodel.setCurrentlyEditingState(None)
-    focusManager.clearFocus(true)
-}
+import kotlinx.coroutines.delay
 
 @Composable
 fun BasicTopAppBar(
@@ -388,7 +265,11 @@ fun NoteTextField(
     val currentIsFocused by rememberUpdatedState(newValue = isFocused)
     val currentShouldPadToNavigationBars by rememberUpdatedState(newValue = shouldPadToNavigationBars)
 
-    val commonTextStyle = MaterialTheme.typography.body1.copy(lineHeight = 28.sp, fontSize = 18.sp, color = contentColor)
+    val commonTextStyle = MaterialTheme.typography.body1.copy(
+        lineHeight = 28.sp,
+        fontSize = 18.sp,
+        color = contentColor
+    )
     val customTextSelectionColors = remember(key1 = contentColor) {
         TextSelectionColors(
             handleColor = contentColor,
@@ -398,6 +279,7 @@ fun NoteTextField(
 
     if (currentIsFocused) {
         LaunchedEffect(key1 = currentIsFocused) {
+            delay(300)
             focusRequester.requestFocus()
         }
     }
@@ -408,7 +290,11 @@ fun NoteTextField(
             modifier = Modifier
                 .background(backgroundColor)
                 .padding(start = 28.dp, top = 8.dp, end = 28.dp)
-                .navigationBarsPadding(bottom = currentShouldPadToNavigationBars)
+                .navigationBarsPadding(
+                    bottom = currentShouldPadToNavigationBars,
+                    start = false,
+                    end = false
+                )
                 .fillMaxSize()
                 .focusRequester(focusRequester)
                 .onFocusChanged { currentFocusChanged(it) },
@@ -440,8 +326,9 @@ fun BottomSheetNoteBackgroundChanger(
     onBackgroundSelected: (BackgroundType) -> Unit
 ) {
     val rowStartEndOffset = 20.dp
-    val surfaceBackgroundColor = if (selectedBackground is SingleColor) selectedBackground.backgroundColor
-    else MaterialTheme.colors.onSurface
+    val surfaceBackgroundColor =
+        if (selectedBackground is BackgroundType.SingleColor) selectedBackground.backgroundColor
+        else MaterialTheme.colors.onSurface
 
     Column(modifier = modifier) {
         Divider(
@@ -537,14 +424,14 @@ private fun BackgroundCardItem(
         shape = shape,
         border = BorderStroke(
             width = (0.1f).dp,
-            color = if (backgroundType is SingleColor)
+            color = if (backgroundType is BackgroundType.SingleColor)
                 backgroundType.contentColor.copy(.25f) else Color.Gray.copy(.25f)
         ),
         elevation = elevation,
-        backgroundColor = if (backgroundType is SingleColor)
+        backgroundColor = if (backgroundType is BackgroundType.SingleColor)
             backgroundType.backgroundColor else Color.Transparent
     ) {
-        if (backgroundType is SingleColor) {
+        if (backgroundType is BackgroundType.SingleColor) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_left_alignment),
                 tint = contentColor ?: MaterialTheme.colors.onSurface,
@@ -552,7 +439,10 @@ private fun BackgroundCardItem(
                 modifier = Modifier.wrapContentSize()
             )
         } else {
-            Image(painter = painterResource(id = R.drawable.ic_launcher_background), contentDescription = null)
+            Image(
+                painter = painterResource(id = R.drawable.ic_launcher_background),
+                contentDescription = null
+            )
         }
     }
 }
@@ -564,7 +454,7 @@ data class ChangeBackgroundItemData(
 ) {
     val derivedContentColor: Color?
         get() {
-            return if (backgroundType is SingleColor) {
+            return if (backgroundType is BackgroundType.SingleColor) {
                 if (isSelected) {
                     backgroundType.contentColor
                 } else {
@@ -585,35 +475,4 @@ enum class CurrentlyEditing {
     Title,
     Note,
     None;
-}
-
-@Preview(showBackground = true)
-@Composable
-fun NewOrEditNotePreview() {
-    NewOrEditNote()
-}
-
-@Preview
-@Composable
-fun ChangeBackgroundItemPreview() {
-    val changeBackgroundItemData = ChangeBackgroundItemData(
-        isSelected = true,
-        strokeColor = Orange500,
-        backgroundType = SingleColor(Grey200, Grey500)
-    )
-    ChangeBackgroundItem(changeBackgroundItemData) {}
-}
-
-@Preview
-@Composable
-fun BottomSheetBackgroundChangerPreview() {
-    val availableSingleColorBackgrounds = listOf(
-        SingleColor(backgroundColor = WhiteMutated, contentColor = BlackMuted),
-        SingleColor(backgroundColor = Blue200, contentColor = Blue500),
-        SingleColor(backgroundColor = Parrot200, contentColor = Parrot500),
-        SingleColor(backgroundColor = Pink200, contentColor = Pink500),
-        SingleColor(backgroundColor = Grey200, contentColor = Grey500),
-        SingleColor(backgroundColor = Green200, contentColor = Green500)
-    )
-    BottomSheetNoteBackgroundChanger(Modifier, availableSingleColorBackgrounds.random(), availableSingleColorBackgrounds) {}
 }
