@@ -42,6 +42,7 @@ import com.jayesh.jnotes.R
 import com.jayesh.jnotes.ui.models.Note
 import com.jayesh.jnotes.ui.models.NoteContent
 import com.jayesh.jnotes.ui.theme.JnotesTheme
+import com.jayesh.jnotes.util.timeAgo
 
 private const val TAG = "NotesListingScreen"
 
@@ -142,7 +143,7 @@ fun NoteItem(
             }
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                 Text(
-                    text = note.createdAt.toString(),
+                    text = note.lastEdit.timeAgo(),
                     style = MaterialTheme.typography.caption
                 )
             }
