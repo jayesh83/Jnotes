@@ -33,6 +33,7 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -97,8 +98,8 @@ fun BasicTopAppBar(
 @Composable
 fun TopAppBarWhenEditingNone(
     modifier: Modifier = Modifier,
-    backgroundColor: Color = Color.Transparent,
-    contentColor: Color = MaterialTheme.colors.onBackground,
+    backgroundColor: Color = MaterialTheme.colors.background,
+    contentColor: Color = contentColorFor(backgroundColor = backgroundColor),
     onBack: () -> Unit,
     onShare: () -> Unit,
     onChangeNoteBackground: () -> Unit
@@ -130,8 +131,8 @@ fun TopAppBarWhenEditingNone(
 @Composable
 fun TopAppBarWhenEditingTitle(
     modifier: Modifier = Modifier,
-    backgroundColor: Color = Color.Transparent,
-    contentColor: Color = MaterialTheme.colors.onBackground,
+    backgroundColor: Color = MaterialTheme.colors.background,
+    contentColor: Color = contentColorFor(backgroundColor = backgroundColor),
     onBack: () -> Unit,
     onEditingComplete: () -> Unit
 ) {
@@ -155,8 +156,8 @@ fun TopAppBarWhenEditingTitle(
 @Composable
 fun TopAppBarWhenEditingContent(
     modifier: Modifier = Modifier,
-    backgroundColor: Color = Color.Transparent,
-    contentColor: Color = MaterialTheme.colors.onBackground,
+    backgroundColor: Color = MaterialTheme.colors.background,
+    contentColor: Color = contentColorFor(backgroundColor = backgroundColor),
     onBack: () -> Unit,
     enableUndo: Boolean,
     onUndo: () -> Unit,
@@ -199,8 +200,8 @@ fun TitleTextField(
     onTitleChange: (TextFieldValue) -> Unit,
     isFocused: Boolean,
     onFocusChanged: (FocusState) -> Unit,
-    backgroundColor: Color = Color.Transparent,
-    contentColor: Color = MaterialTheme.colors.onBackground
+    backgroundColor: Color = MaterialTheme.colors.background,
+    contentColor: Color = contentColorFor(backgroundColor = backgroundColor),
 ) {
     val focusRequester = remember { FocusRequester() }
     val currentFocusChanged by rememberUpdatedState(newValue = onFocusChanged)
@@ -231,7 +232,7 @@ fun TitleTextField(
                 .focusRequester(focusRequester)
                 .onFocusChanged { currentFocusChanged(it) },
             textStyle = commonTextStyle,
-            cursorBrush = SolidColor(MaterialTheme.colors.onSurface),
+            cursorBrush = SolidColor(contentColor),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
                 capitalization = KeyboardCapitalization.Sentences
@@ -256,8 +257,8 @@ fun NoteTextField(
     onNoteChange: (TextFieldValue) -> Unit,
     isFocused: Boolean,
     onFocusChanged: (FocusState) -> Unit,
-    backgroundColor: Color = Color.Transparent,
-    contentColor: Color = MaterialTheme.colors.onBackground,
+    backgroundColor: Color = MaterialTheme.colors.background,
+    contentColor: Color = contentColorFor(backgroundColor = backgroundColor),
     shouldPadToNavigationBars: Boolean = false,
     onSoftKeyboardDismissed: (() -> Unit)? = null
 ) {
@@ -302,7 +303,7 @@ fun NoteTextField(
                 .onFocusChanged { currentFocusChanged(it) }
                 .clearFocusOnKeyboardDismiss(onSoftKeyboardDismissed),
             textStyle = commonTextStyle,
-            cursorBrush = SolidColor(MaterialTheme.colors.onSurface),
+            cursorBrush = SolidColor(contentColor),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
                 capitalization = KeyboardCapitalization.Sentences
@@ -326,23 +327,22 @@ fun BottomSheetNoteBackgroundChanger(
     modifier: Modifier = Modifier,
     selectedBackground: BackgroundType,
     backgroundList: List<BackgroundType>,
+    backgroundColor: Color = MaterialTheme.colors.background,
     onBackgroundSelected: (BackgroundType) -> Unit
 ) {
     val rowStartEndOffset = 20.dp
-    val surfaceBackgroundColor =
-        if (selectedBackground is BackgroundType.SingleColor) selectedBackground.backgroundColor
-        else MaterialTheme.colors.onSurface
 
     Column(modifier = modifier) {
         Divider(
             modifier = Modifier.fillMaxWidth(),
-            thickness = (0.2f).dp
+            thickness = (0.2f).dp,
+            color = contentColorFor(backgroundColor = backgroundColor).copy(alpha = 0.22f)
         )
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
                 .clipToBounds(),
-            color = surfaceBackgroundColor
+            color = backgroundColor
         ) {
             LazyRow(modifier = Modifier.padding(vertical = 8.dp)) {
                 item {
@@ -437,7 +437,7 @@ private fun BackgroundCardItem(
         if (backgroundType is BackgroundType.SingleColor) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_left_alignment),
-                tint = contentColor ?: MaterialTheme.colors.onSurface,
+                tint = contentColor ?: MaterialTheme.colors.onBackground,
                 contentDescription = "Change background",
                 modifier = Modifier.wrapContentSize()
             )

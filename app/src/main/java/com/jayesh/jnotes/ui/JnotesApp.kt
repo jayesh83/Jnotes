@@ -10,7 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.jayesh.jnotes.ui.Screen.NoteCreateNew
 import com.jayesh.jnotes.ui.Screen.NoteEdit
-import com.jayesh.jnotes.ui.Screen.NotesListing
+import com.jayesh.jnotes.ui.Screen.Notes
 import com.jayesh.jnotes.ui.newOrEditNote.NewOrEditNoteScreen
 import com.jayesh.jnotes.ui.notesListing.NotesListingScreen
 
@@ -20,11 +20,9 @@ fun JnotesApp() {
 
     NavHost(
         navController = navController,
-        startDestination = NotesListing.route
+        startDestination = Notes.route
     ) {
-        composable(
-            route = NotesListing.route
-        ) {
+        composable(route = Notes.route) {
             NotesListingScreen(
                 viewmodel = hiltViewModel(),
                 onAddNewNote = {
@@ -65,11 +63,11 @@ fun JnotesApp() {
 }
 
 sealed class Screen(val route: String) {
-    object NotesListing : Screen("note_listing")
-    object NoteEdit : Screen("notes_view_or_edit/{noteId}") {
-        fun createRoute(noteId: String) = "notes_view_or_edit/$noteId"
+    object Notes : Screen("notes")
+    object NoteEdit : Screen("notes/view_or_edit/{noteId}") {
+        fun createRoute(noteId: String) = "notes/view_or_edit/$noteId"
     }
 
-    object NoteCreateNew : Screen("notes_create_new")
+    object NoteCreateNew : Screen("notes/create_new")
 }
 

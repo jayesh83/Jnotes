@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -26,6 +27,7 @@ import com.jayesh.jnotes.ui.theme.Green200
 import com.jayesh.jnotes.ui.theme.Green500
 import com.jayesh.jnotes.ui.theme.Grey200
 import com.jayesh.jnotes.ui.theme.Grey500
+import com.jayesh.jnotes.ui.theme.JnotesTheme
 import com.jayesh.jnotes.ui.theme.Orange500
 import com.jayesh.jnotes.ui.theme.Parrot200
 import com.jayesh.jnotes.ui.theme.Parrot500
@@ -66,87 +68,87 @@ fun NewOrEditNoteScreen(
         onBackPress()
     }
 
-    Column(
-        modifier = Modifier
-            .background(viewmodel.selectedBackgroundType.backgroundColor)
-            .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding(
-                start = true,
-                end = true,
-                bottom = false
-            ) // when in landscape mode, apply end edge navigation bar padding
+    JnotesTheme(
+        backgroundColor = viewmodel.selectedBackgroundType.backgroundColor,
+        contentColor = viewmodel.selectedBackgroundType.contentColor
     ) {
-        when (viewmodel.currentlyEditing) {
-            Title -> {
-                TopAppBarWhenEditingTitle(
-                    onBack = { onBackPress() },
-                    onEditingComplete = {
-                        setEditingComplete(viewmodel, focusManager)
-                    },
-                    contentColor = viewmodel.selectedBackgroundType.contentColor
-                )
-            }
-            Note -> {
-                TopAppBarWhenEditingContent(
-                    onBack = { onBackPress() },
-                    enableUndo = viewmodel.enableUndo,
-                    onUndo = viewmodel::undo,
-                    enableRedo = viewmodel.enableRedo,
-                    onRedo = viewmodel::redo,
-                    onEditingComplete = {
-                        setEditingComplete(viewmodel, focusManager)
-                    },
-                    contentColor = viewmodel.selectedBackgroundType.contentColor
-                )
-            }
-            None -> {
-                TopAppBarWhenEditingNone(
-                    onBack = { onBackPress() },
-                    onShare = {},
-                    onChangeNoteBackground = viewmodel::toggleNoteBackgroundChangerState,
-                    contentColor = viewmodel.selectedBackgroundType.contentColor
-                )
-            }
-        }
-        Box {
-            Column(
-                modifier = Modifier.align(Alignment.TopStart)
-            ) {
-                TitleTextField(
-                    textFieldValue = viewmodel.titleTextFieldState,
-                    onTitleChange = viewmodel::setOnTitleChange,
-                    isFocused = viewmodel.currentlyEditing == Title,
-                    onFocusChanged = {
-                        if (it.isFocused) {
-                            viewmodel.setCurrentlyEditingState(Title)
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colors.background)
+                .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding(
+                    start = true,
+                    end = true,
+                    bottom = false
+                ) // when in landscape mode, apply end edge navigation bar padding
+        ) {
+            when (viewmodel.currentlyEditing) {
+                Title -> {
+                    TopAppBarWhenEditingTitle(
+                        onBack = { onBackPress() },
+                        onEditingComplete = {
+                            setEditingComplete(viewmodel, focusManager)
                         }
-                    },
-                    contentColor = viewmodel.selectedBackgroundType.contentColor
-                )
-                NoteTextField(
-                    textFieldValue = viewmodel.noteTextFieldState,
-                    onNoteChange = viewmodel::setOnNoteChange,
-                    isFocused = viewmodel.currentlyEditing == Note,
-                    onFocusChanged = {
-                        if (it.isFocused) {
-                            viewmodel.setCurrentlyEditingState(Note)
+                    )
+                }
+                Note -> {
+                    TopAppBarWhenEditingContent(
+                        onBack = { onBackPress() },
+                        enableUndo = viewmodel.enableUndo,
+                        onUndo = viewmodel::undo,
+                        enableRedo = viewmodel.enableRedo,
+                        onRedo = viewmodel::redo,
+                        onEditingComplete = {
+                            setEditingComplete(viewmodel, focusManager)
                         }
-                    },
-                    contentColor = viewmodel.selectedBackgroundType.contentColor,
-                    shouldPadToNavigationBars = viewmodel.noteBackgroundChangerBottomSheetVisible,
-                    onSoftKeyboardDismissed = {
-                        viewmodel.setCurrentlyEditingState(None)
-                    }
-                )
+                    )
+                }
+                None -> {
+                    TopAppBarWhenEditingNone(
+                        onBack = { onBackPress() },
+                        onShare = {},
+                        onChangeNoteBackground = viewmodel::toggleNoteBackgroundChangerState
+                    )
+                }
             }
-            if (viewmodel.noteBackgroundChangerBottomSheetVisible) {
-                BottomSheetNoteBackgroundChanger(
-                    modifier = Modifier.align(Alignment.BottomCenter),
-                    selectedBackground = viewmodel.selectedBackgroundType,
-                    onBackgroundSelected = viewmodel::setOnBackgroundChange,
-                    backgroundList = viewmodel.availableSingleColorBackgrounds()
-                )
+            Box {
+                Column(
+                    modifier = Modifier.align(Alignment.TopStart)
+                ) {
+                    TitleTextField(
+                        textFieldValue = viewmodel.titleTextFieldState,
+                        onTitleChange = viewmodel::setOnTitleChange,
+                        isFocused = viewmodel.currentlyEditing == Title,
+                        onFocusChanged = {
+                            if (it.isFocused) {
+                                viewmodel.setCurrentlyEditingState(Title)
+                            }
+                        }
+                    )
+                    NoteTextField(
+                        textFieldValue = viewmodel.noteTextFieldState,
+                        onNoteChange = viewmodel::setOnNoteChange,
+                        isFocused = viewmodel.currentlyEditing == Note,
+                        onFocusChanged = {
+                            if (it.isFocused) {
+                                viewmodel.setCurrentlyEditingState(Note)
+                            }
+                        },
+                        shouldPadToNavigationBars = viewmodel.noteBackgroundChangerBottomSheetVisible,
+                        onSoftKeyboardDismissed = {
+                            viewmodel.setCurrentlyEditingState(None)
+                        }
+                    )
+                }
+                if (viewmodel.noteBackgroundChangerBottomSheetVisible) {
+                    BottomSheetNoteBackgroundChanger(
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                        selectedBackground = viewmodel.selectedBackgroundType,
+                        onBackgroundSelected = viewmodel::setOnBackgroundChange,
+                        backgroundList = viewmodel.availableSingleColorBackgrounds()
+                    )
+                }
             }
         }
     }
