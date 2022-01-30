@@ -2,6 +2,8 @@ package com.jayesh.jnotes.ui.newOrEditNote
 
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -83,33 +85,35 @@ fun NewOrEditNoteScreen(
                     bottom = false
                 ) // when in landscape mode, apply end edge navigation bar padding
         ) {
-            when (viewmodel.currentlyEditing) {
-                Title -> {
-                    TopAppBarWhenEditingTitle(
-                        onBack = { onBackPress() },
-                        onEditingComplete = {
-                            setEditingComplete(viewmodel, focusManager)
-                        }
-                    )
-                }
-                Note -> {
-                    TopAppBarWhenEditingContent(
-                        onBack = { onBackPress() },
-                        enableUndo = viewmodel.enableUndo,
-                        onUndo = viewmodel::undo,
-                        enableRedo = viewmodel.enableRedo,
-                        onRedo = viewmodel::redo,
-                        onEditingComplete = {
-                            setEditingComplete(viewmodel, focusManager)
-                        }
-                    )
-                }
-                None -> {
-                    TopAppBarWhenEditingNone(
-                        onBack = { onBackPress() },
-                        onShare = {},
-                        onChangeNoteBackground = viewmodel::toggleNoteBackgroundChangerState
-                    )
+            Crossfade(viewmodel.currentlyEditing, animationSpec = spring()) { currentlyEditing ->
+                when (currentlyEditing) {
+                    Title -> {
+                        TopAppBarWhenEditingTitle(
+                            onBack = { onBackPress() },
+                            onEditingComplete = {
+                                setEditingComplete(viewmodel, focusManager)
+                            }
+                        )
+                    }
+                    Note -> {
+                        TopAppBarWhenEditingContent(
+                            onBack = { onBackPress() },
+                            enableUndo = viewmodel.enableUndo,
+                            onUndo = viewmodel::undo,
+                            enableRedo = viewmodel.enableRedo,
+                            onRedo = viewmodel::redo,
+                            onEditingComplete = {
+                                setEditingComplete(viewmodel, focusManager)
+                            }
+                        )
+                    }
+                    None -> {
+                        TopAppBarWhenEditingNone(
+                            onBack = { onBackPress() },
+                            onShare = {},
+                            onChangeNoteBackground = viewmodel::toggleNoteBackgroundChangerState
+                        )
+                    }
                 }
             }
             Box {
