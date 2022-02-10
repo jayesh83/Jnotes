@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface INotesLocalDataSource {
     suspend fun saveNote(note: Note): DbResult
-    fun getNote(id: String): Flow<Note?>
+    suspend fun getNote(id: String): Note?
     fun getAllNotes(): Flow<List<Note>?>
     suspend fun editNote(id: String, note: Note): DbResult
     suspend fun deleteNote(id: String): DbResult

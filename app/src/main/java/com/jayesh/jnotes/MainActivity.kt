@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -30,7 +31,7 @@ class MainActivity : ComponentActivity() {
 
             SideEffect {
                 Log.e(TAG, "onCreate: SideEffect called")
-                systemUiController.setSystemBarsColor(Color.Transparent, darkIcons = useDarkIcons)
+                systemUiController.setSystemBarsColor(color = Color.Transparent, isNavigationBarContrastEnforced = false, darkIcons = useDarkIcons)
                 changeSystemBarsIconsColor(window, useDarkIcons)
             }
 
@@ -48,7 +49,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun changeSystemBarsIconsColor(window: Window, darkIcons: Boolean) {
-        val windowController = WindowCompat.getInsetsController(window, window.decorView)
+        val windowController = ViewCompat.getWindowInsetsController(window.decorView)
         windowController?.isAppearanceLightStatusBars = darkIcons
         windowController?.isAppearanceLightNavigationBars = darkIcons
     }

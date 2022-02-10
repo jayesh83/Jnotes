@@ -17,20 +17,18 @@ class NotesLocalDataSource @Inject constructor(
     private val notes: ArrayList<NoteLocalEntity> = arrayListOf()
 
     override suspend fun saveNote(note: Note): DbResult {
-        notes.add(mapper.mapToEntity(note))
+        notes.add(mapper.mapFromDomain(note))
         return DbResult.Success
     }
 
-    override fun getNote(id: String): Flow<Note?> {
+    override suspend fun getNote(id: String): Note? {
         Log.d(TAG, "getNote() called with: id = $id")
-        return flow {
-            //delay(Random.nextLong(500))
-            val noteEntity = notes.find { it.id == id }
-            if (noteEntity != null) {
-                emit(mapper.mapFromEntity(noteEntity))
-            } else {
-                emit(null)
-            }
+        //delay(Random.nextLong(500))
+        val noteEntity = notes.find { it.id == id }
+        return if (noteEntity != null) {
+            mapper.mapToDomain(noteEntity)
+        } else {
+            null
         }
     }
 
@@ -39,7 +37,7 @@ class NotesLocalDataSource @Inject constructor(
         return flow {
             //delay(Random.nextLong(1000))
             val latestNotes = notes
-                .map { noteLocalEntity -> mapper.mapFromEntity(noteLocalEntity) }
+                .map { noteLocalEntity -> mapper.mapToDomain(noteLocalEntity) }
                 .sortedByDescending { it.lastEdit }
             emit(latestNotes)
         }
@@ -49,7 +47,7 @@ class NotesLocalDataSource @Inject constructor(
         val oldNoteIndexedValue = notes.withIndex().find { it.value.id == id }
         return try {
             if (oldNoteIndexedValue != null) {
-                notes[oldNoteIndexedValue.index] = mapper.mapToEntity(note)
+                notes[oldNoteIndexedValue.index] = mapper.mapFromDomain(note)
                 DbResult.Success
             } else {
                 DbResult.Failure

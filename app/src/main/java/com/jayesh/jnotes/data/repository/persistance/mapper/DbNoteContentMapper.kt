@@ -7,11 +7,11 @@ import javax.inject.Inject
 
 class DbNoteContentMapper @Inject constructor() :
     EntityMapper<NoteContentLocalEntity, NoteContent> {
-    override fun mapFromEntity(entity: NoteContentLocalEntity): NoteContent {
+    override fun mapToDomain(entity: NoteContentLocalEntity): NoteContent {
         return NoteContent(entity.text)
     }
 
-    override fun mapToEntity(domainModel: NoteContent): NoteContentLocalEntity {
+    override fun mapFromDomain(domainModel: NoteContent): NoteContentLocalEntity {
         return NoteContentLocalEntity(domainModel.text)
     }
 }

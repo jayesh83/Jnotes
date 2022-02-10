@@ -8,7 +8,7 @@ interface INotesRepository {
     /** through local db **/
     suspend fun saveNote(note: Note): DbResult
 
-    fun getNote(id: String): Flow<Note?>
+    suspend fun getNote(id: String): Note?
 
     fun getAllNotes(): Flow<List<Note>?>
 

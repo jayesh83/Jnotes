@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 class DbNoteConfigMapper @Inject constructor() :
     EntityMapper<NoteConfigLocalEntity, NoteConfig> {
-    override fun mapFromEntity(entity: NoteConfigLocalEntity): NoteConfig {
+    override fun mapToDomain(entity: NoteConfigLocalEntity): NoteConfig {
         return NoteConfig(
             Color(entity.backgroundColor),
             Color(entity.contentColor),
@@ -17,7 +17,7 @@ class DbNoteConfigMapper @Inject constructor() :
         )
     }
 
-    override fun mapToEntity(domainModel: NoteConfig): NoteConfigLocalEntity {
+    override fun mapFromDomain(domainModel: NoteConfig): NoteConfigLocalEntity {
         return NoteConfigLocalEntity(
             domainModel.backgroundColor.toArgb(),
             domainModel.contentColor.toArgb(),

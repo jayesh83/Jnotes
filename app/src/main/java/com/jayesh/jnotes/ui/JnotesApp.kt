@@ -28,8 +28,8 @@ fun JnotesApp() {
                 onAddNewNote = {
                     navController.navigate(NoteCreateNew.route)
                 },
-                onEditNote = {
-                    navController.navigate(NoteEdit.createRoute(it))
+                onEditNote = { noteId ->
+                    navController.navigate(NoteEdit.createRoute(noteId))
                 }
             )
         }
@@ -37,10 +37,8 @@ fun JnotesApp() {
         composable(
             route = NoteEdit.route,
             arguments = listOf(navArgument("noteId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getString("noteId")
+        ) {
             NewOrEditNoteScreen(
-                noteId = id,
                 viewmodel = hiltViewModel(),
                 onBack = {
                     navController.navigateUp()
@@ -52,7 +50,6 @@ fun JnotesApp() {
             route = NoteCreateNew.route
         ) {
             NewOrEditNoteScreen(
-                noteId = null,
                 viewmodel = hiltViewModel(),
                 onBack = {
                     navController.navigateUp()

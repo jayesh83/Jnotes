@@ -31,8 +31,6 @@ import com.jayesh.jnotes.ui.theme.Pink500
 import com.jayesh.jnotes.ui.theme.WhiteMutated
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Operation.DELETE
@@ -55,24 +53,6 @@ class NewOrEditNoteViewmodel @Inject constructor(
     private var oldNote: Note? = null
     private val isNewNote get() = oldNote == null
 
-    fun initViewModel(noteId: String?) {  // init should happen via constructor injection
-        this.noteId = noteId
-        if (noteId == null) {
-            currentlyEditing = CurrentlyEditing.Note
-        } else {
-            viewModelScope.launch {
-                val note = notesRepository.getNote(noteId)
-                note.collect {
-                    it?.let { setupNote(it) }
-                }
-            }
-        }
-    }
-
-    init {
-        Log.e(TAG, ": init new or edit viewmodel")
-    }
-
     var currentlyEditing by mutableStateOf(CurrentlyEditing.None) // denotes what is being edited currently. It can be title, note or none
         private set
     var titleTextFieldState by mutableStateOf(TextFieldValue(""))
@@ -91,6 +71,21 @@ class NewOrEditNoteViewmodel @Inject constructor(
 
     val enableUndo get() = stackOfUndo.size > 0
     val enableRedo get() = stackOfRedo.size > 0
+
+    init {
+        val noteId = savedStateHandle.get<String>("noteId")
+        this.noteId = noteId
+
+        if (noteId != null) {
+            viewModelScope.launch {
+                notesRepository.getNote(noteId)?.also { note ->
+                    setupNote(note)
+                }
+            }
+        } else {
+            currentlyEditing = CurrentlyEditing.Note
+        }
+    }
 
     private fun setupNote(oldNote: Note) {
         this.oldNote = oldNote
@@ -253,7 +248,7 @@ class NewOrEditNoteViewmodel @Inject constructor(
         return notesRepository.saveNote(note)
     }
 
-    override fun getNote(id: String): Flow<Note?> {
+    override suspend fun getNote(id: String): Note? {
         return notesRepository.getNote(id)
     }
 

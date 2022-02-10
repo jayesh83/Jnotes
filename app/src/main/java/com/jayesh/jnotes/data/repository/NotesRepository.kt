@@ -16,7 +16,7 @@ class NotesRepository @Inject constructor(
         return persistence.saveNote(note)
     }
 
-    override fun getNote(id: String): Flow<Note?> {
+    override suspend fun getNote(id: String): Note? {
         return persistence.getNote(id)
     }
 

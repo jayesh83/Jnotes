@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
@@ -44,29 +43,23 @@ private const val TAG = "NewOrEditNote"
 
 @Composable
 fun NewOrEditNoteScreen(
-    noteId: String? = null, // null id denotes creation of new note
     viewmodel: NewOrEditNoteViewmodel,
     onBack: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
 
-    LaunchedEffect(key1 = viewmodel) {
-        Log.e(TAG, "NewOrEditNoteScreen: initializing viewmodel")
-        viewmodel.initViewModel(noteId)
-    }
-
     fun onBackPress() {
-        focusManager.clearFocus(true)
-        viewmodel.updateNoteIfNeeded()
-        onBack()
+        if (viewmodel.noteBackgroundChangerBottomSheetVisible) {
+            viewmodel.toggleNoteBackgroundChangerState()
+        } else {
+            focusManager.clearFocus(true)
+            viewmodel.updateNoteIfNeeded()
+            onBack()
+        }
     }
 
     BackHandler {
         Log.e(TAG, "NewOrEditNoteScreen: BackHandler called")
-        if (viewmodel.noteBackgroundChangerBottomSheetVisible) {
-            viewmodel.toggleNoteBackgroundChangerState()
-            return@BackHandler
-        }
         onBackPress()
     }
 

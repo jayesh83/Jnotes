@@ -14,23 +14,23 @@ class DbNoteMapper @Inject constructor(
     private val dbNoteContentMapper: EntityMapper<NoteContentLocalEntity, NoteContent>,
 ) : EntityMapper<NoteLocalEntity, Note> {
 
-    override fun mapFromEntity(entity: NoteLocalEntity): Note {
+    override fun mapToDomain(entity: NoteLocalEntity): Note {
         return Note(
             title = entity.title,
-            content = dbNoteContentMapper.mapFromEntity(entity.content),
+            content = dbNoteContentMapper.mapToDomain(entity.content),
             id = entity.id,
-            config = dbNoteConfigMapper.mapFromEntity(entity.config),
+            config = dbNoteConfigMapper.mapToDomain(entity.config),
             lastEdit = entity.lastEdit,
             createdAt = entity.createdAt
         )
     }
 
-    override fun mapToEntity(domainModel: Note): NoteLocalEntity {
+    override fun mapFromDomain(domainModel: Note): NoteLocalEntity {
         return NoteLocalEntity(
             title = domainModel.title,
-            content = dbNoteContentMapper.mapToEntity(domainModel.content),
+            content = dbNoteContentMapper.mapFromDomain(domainModel.content),
             id = domainModel.id,
-            config = dbNoteConfigMapper.mapToEntity(domainModel.config),
+            config = dbNoteConfigMapper.mapFromDomain(domainModel.config),
             lastEdit = domainModel.lastEdit,
             createdAt = domainModel.createdAt
         )
