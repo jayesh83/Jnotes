@@ -29,7 +29,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
@@ -79,10 +78,11 @@ fun NotesListingScreen(
                 )
             }
         ) {
-            val notes by viewmodel.getAllNotes().collectAsState(initial = null)
-            notes?.let {
-                LazyColumn {
-                    items(it) { note ->
+            val notes = viewmodel.notes.collectAsState().value
+            LazyColumn {
+                items(
+                    items = notes,
+                    itemContent = { note ->
                         NoteItem(
                             note = note,
                             onItemClick = { noteId ->
@@ -91,7 +91,7 @@ fun NotesListingScreen(
                             }
                         )
                     }
-                }
+                )
             }
         }
     }

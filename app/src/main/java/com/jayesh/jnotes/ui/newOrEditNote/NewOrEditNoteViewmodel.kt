@@ -271,21 +271,3 @@ class NewOrEditNoteViewmodel @Inject constructor(
         CREATE, UPDATE, DELETE, NOTHING
     }
 }
-
-/*    companion object {
-        fun provideFactory(
-            assistedFactory: ViewModelProvider.Factory,
-            noteId: String?
-        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                val factory = assistedFactory.create(noteId)
-                return factory as T
-            }
-        }
-    }*/
-
-
-/*
-@Module
-@InstallIn(ActivityRetainedComponent::class)
-interface AssistedInjectModule*/

@@ -10,7 +10,7 @@ interface INotesRepository {
 
     suspend fun getNote(id: String): Note?
 
-    fun getAllNotes(): Flow<List<Note>?>
+    fun getAllNotes(): Flow<List<Note>>
 
     suspend fun editNote(id: String, note: Note): DbResult
 

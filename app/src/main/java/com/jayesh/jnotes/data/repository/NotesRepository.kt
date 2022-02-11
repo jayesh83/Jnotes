@@ -20,7 +20,7 @@ class NotesRepository @Inject constructor(
         return persistence.getNote(id)
     }
 
-    override fun getAllNotes(): Flow<List<Note>?> {
+    override fun getAllNotes(): Flow<List<Note>> {
         return persistence.getAllNotes()
     }
 
