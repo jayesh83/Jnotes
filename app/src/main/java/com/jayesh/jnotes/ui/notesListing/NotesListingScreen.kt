@@ -2,6 +2,9 @@ package com.jayesh.jnotes.ui.notesListing
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.util.Log
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -13,7 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExtendedFloatingActionButton
@@ -45,55 +48,69 @@ import com.jayesh.jnotes.util.timeAgo
 
 private const val TAG = "NotesListingScreen"
 
+@ExperimentalFoundationApi
 @Composable
 fun NotesListingScreen(
     viewmodel: NotesListingViewmodel,
     onAddNewNote: () -> Unit,
     onEditNote: (noteId: String) -> Unit
 ) {
-    JnotesTheme {
-        Scaffold(
-            modifier = Modifier
-                .fillMaxSize()
-                .statusBarsPadding()
-                .navigationBarsPadding(
-                    start = true,
-                    end = true,
-                    bottom = true
-                ), // when in landscape mode, apply end edge navigation bar padding
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text(text = stringResource(id = R.string.app_name))
-                    }
-                )
-            },
-            floatingActionButton = {
-                ExtendedFloatingActionButton(
-                    text = { Text(text = stringResource(R.string.new_note)) },
-                    icon = {
-                        Icon(imageVector = Icons.Default.Add, "Icon Add")
-                    },
-                    onClick = onAddNewNote
-                )
-            }
-        ) {
-            val notes = viewmodel.notes.collectAsState().value
-            LazyColumn {
-                items(
-                    items = notes,
-                    itemContent = { note ->
-                        NoteItem(
-                            note = note,
-                            onItemClick = { noteId ->
-                                Log.e(TAG, "NotesListingScreen: noteId: $noteId clicked")
-                                onEditNote(noteId)
-                            }
-                        )
-                    }
-                )
-            }
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding(
+                start = true,
+                end = true,
+                bottom = true
+            ), // when in landscape mode, apply end edge navigation bar padding
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(text = stringResource(id = R.string.app_name))
+                }
+            )
+        },
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                text = { Text(text = stringResource(R.string.new_note)) },
+                icon = {
+                    Icon(imageVector = Icons.Default.Add, "Icon Add")
+                },
+                onClick = onAddNewNote
+            )
         }
+    ) {
+        NoteList(
+            notes = viewmodel.notes.collectAsState().value,
+            onItemClick = { noteId ->
+                Log.e(TAG, "NotesListingScreen: noteId: $noteId clicked")
+                onEditNote(noteId)
+            }
+        )
+    }
+}
+
+@ExperimentalFoundationApi
+@Composable
+private fun NoteList(notes: List<Note>, onItemClick: (String) -> Unit) {
+    LazyColumn {
+        itemsIndexed(
+            items = notes,
+            key = { _, note -> note.id },
+            itemContent = { _, note ->
+                NoteItem(
+                    note = note,
+                    onItemClick = onItemClick,
+                    modifier = Modifier.animateItemPlacement(
+                        animationSpec = tween(
+                            durationMillis = 500,
+                            easing = LinearOutSlowInEasing,
+                        )
+                    )
+                )
+            }
+        )
     }
 }
 
