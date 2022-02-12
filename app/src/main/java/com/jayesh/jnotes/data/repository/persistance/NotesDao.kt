@@ -15,7 +15,7 @@ interface NotesDao {
     suspend fun saveNote(note: NoteLocalEntity)
 
     /** Read **/
-    @Query("SELECT * FROM note")
+    @Query("SELECT * FROM note ORDER BY last_edit DESC")
     fun getAllNotes(): Flow<List<NoteLocalEntity>>
 
     @Query("SELECT * FROM note WHERE id = :noteId")
