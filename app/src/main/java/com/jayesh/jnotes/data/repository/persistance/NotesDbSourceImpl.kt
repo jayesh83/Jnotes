@@ -12,10 +12,10 @@ import javax.inject.Inject
 
 private const val TAG = "NotesLocalDataSource"
 
-class NotesLocalDataSource @Inject constructor(
+class NotesDbSourceImpl @Inject constructor(
     private val notesDao: NotesDao,
     private val mapper: EntityMapper<NoteLocalEntity, Note>
-) : INotesLocalDataSource {
+) : NotesDbSource {
 
     override suspend fun saveNote(note: Note): DbResult {
         notesDao.saveNote(mapper.mapFromDomain(note))

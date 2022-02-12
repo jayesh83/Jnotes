@@ -1,16 +1,16 @@
 package com.jayesh.jnotes.data.repository
 
 import com.jayesh.jnotes.data.repository.persistance.DbResult
-import com.jayesh.jnotes.data.repository.persistance.INotesLocalDataSource
+import com.jayesh.jnotes.data.repository.persistance.NotesDbSource
 import com.jayesh.jnotes.ui.models.Note
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 private const val TAG = "NotesRepository"
 
-class NotesRepository @Inject constructor(
-    private val persistence: INotesLocalDataSource
-) : INotesRepository {
+class NotesRepoImpl @Inject constructor(
+    private val persistence: NotesDbSource
+) : NotesRepo {
 
     override suspend fun saveNote(note: Note): DbResult {
         return persistence.saveNote(note)

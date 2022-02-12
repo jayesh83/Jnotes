@@ -1,9 +1,9 @@
 package com.jayesh.jnotes.di
 
-import com.jayesh.jnotes.data.repository.INotesRepository
-import com.jayesh.jnotes.data.repository.NotesRepository
-import com.jayesh.jnotes.data.repository.persistance.INotesLocalDataSource
-import com.jayesh.jnotes.data.repository.persistance.NotesLocalDataSource
+import com.jayesh.jnotes.data.repository.NotesRepo
+import com.jayesh.jnotes.data.repository.NotesRepoImpl
+import com.jayesh.jnotes.data.repository.persistance.NotesDbSource
+import com.jayesh.jnotes.data.repository.persistance.NotesDbSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -15,13 +15,13 @@ import javax.inject.Singleton
 interface AppModule {
     @Singleton
     @Binds
-    fun provideLocalDataSource(
-        dataSource: NotesLocalDataSource
-    ): INotesLocalDataSource
+    fun provideDbSource(
+        dbSourceImpl: NotesDbSourceImpl
+    ): NotesDbSource
 
     @Singleton
     @Binds
     fun provideNotesRepository(
-        notesRepository: NotesRepository
-    ): INotesRepository
+        notesRepoImpl: NotesRepoImpl
+    ): NotesRepo
 }

@@ -3,7 +3,7 @@ package com.jayesh.jnotes.data.repository.persistance
 import com.jayesh.jnotes.ui.models.Note
 import kotlinx.coroutines.flow.Flow
 
-interface INotesLocalDataSource {
+interface NotesDbSource {
     suspend fun saveNote(note: Note): DbResult
     suspend fun getNote(id: String): Note?
     fun getAllNotes(): Flow<List<Note>>

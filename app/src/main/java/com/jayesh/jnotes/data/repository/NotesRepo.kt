@@ -4,7 +4,7 @@ import com.jayesh.jnotes.data.repository.persistance.DbResult
 import com.jayesh.jnotes.ui.models.Note
 import kotlinx.coroutines.flow.Flow
 
-interface INotesRepository {
+interface NotesRepo {
     /** through local db **/
     suspend fun saveNote(note: Note): DbResult
 

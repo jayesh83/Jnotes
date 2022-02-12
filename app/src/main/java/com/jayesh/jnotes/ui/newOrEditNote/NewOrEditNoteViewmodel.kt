@@ -9,7 +9,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.jayesh.jnotes.data.repository.INotesRepository
+import com.jayesh.jnotes.data.repository.NotesRepo
 import com.jayesh.jnotes.data.repository.persistance.DbResult
 import com.jayesh.jnotes.ui.models.Note
 import com.jayesh.jnotes.ui.models.NoteConfig
@@ -45,7 +45,7 @@ const val UNDO_REDO_STACK_MAX_SIZE = 10
 
 @HiltViewModel
 class NewOrEditNoteViewmodel @Inject constructor(
-    private val notesRepository: INotesRepository,
+    private val repo: NotesRepo,
     savedStateHandle: SavedStateHandle
 ) : INewOrEditNoteViewmodel() {
 
@@ -78,7 +78,7 @@ class NewOrEditNoteViewmodel @Inject constructor(
 
         if (noteId != null) {
             viewModelScope.launch {
-                notesRepository.getNote(noteId)?.also { note ->
+                repo.getNote(noteId)?.also { note ->
                     setupNote(note)
                 }
             }
@@ -245,19 +245,19 @@ class NewOrEditNoteViewmodel @Inject constructor(
 
 
     override suspend fun saveNote(note: Note): DbResult {
-        return notesRepository.saveNote(note)
+        return repo.saveNote(note)
     }
 
     override suspend fun getNote(id: String): Note? {
-        return notesRepository.getNote(id)
+        return repo.getNote(id)
     }
 
     override suspend fun updateNote(id: String, note: Note): DbResult {
-        return notesRepository.editNote(id, note)
+        return repo.editNote(id, note)
     }
 
     override suspend fun deleteNote(id: String): DbResult {
-        return notesRepository.deleteNote(id)
+        return repo.deleteNote(id)
     }
 
     private fun randomId() = UUID.randomUUID()?.toString() ?: System.currentTimeMillis().toString()
