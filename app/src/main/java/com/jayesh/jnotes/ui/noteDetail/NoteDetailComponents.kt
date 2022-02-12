@@ -1,4 +1,4 @@
-package com.jayesh.jnotes.ui.newOrEditNote
+package com.jayesh.jnotes.ui.noteDetail
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image

@@ -1,4 +1,4 @@
-package com.jayesh.jnotes.ui.notesListing
+package com.jayesh.jnotes.ui.notes
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
@@ -16,10 +16,10 @@ import javax.inject.Inject
 private const val TAG = "NotesListingViewmodel"
 
 @HiltViewModel
-class NotesListingViewmodel @Inject constructor(
+class NotesViewmodelImpl @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repo: NotesRepo
-) : INotesListingViewmodel() {
+) : NotesViewmodel() {
     private val _notes: MutableStateFlow<List<Note>> = MutableStateFlow(emptyList())
     val notes: StateFlow<List<Note>> = _notes
 

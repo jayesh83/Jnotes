@@ -1,4 +1,4 @@
-package com.jayesh.jnotes.ui.newOrEditNote
+package com.jayesh.jnotes.ui.noteDetail
 
 import android.util.Log
 import androidx.activity.compose.BackHandler
@@ -17,10 +17,10 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
-import com.jayesh.jnotes.ui.newOrEditNote.BackgroundType.SingleColor
-import com.jayesh.jnotes.ui.newOrEditNote.CurrentlyEditing.None
-import com.jayesh.jnotes.ui.newOrEditNote.CurrentlyEditing.Note
-import com.jayesh.jnotes.ui.newOrEditNote.CurrentlyEditing.Title
+import com.jayesh.jnotes.ui.noteDetail.BackgroundType.SingleColor
+import com.jayesh.jnotes.ui.noteDetail.CurrentlyEditing.None
+import com.jayesh.jnotes.ui.noteDetail.CurrentlyEditing.Note
+import com.jayesh.jnotes.ui.noteDetail.CurrentlyEditing.Title
 import com.jayesh.jnotes.ui.theme.BlackMuted
 import com.jayesh.jnotes.ui.theme.Blue200
 import com.jayesh.jnotes.ui.theme.Blue500
@@ -42,8 +42,8 @@ private const val TAG = "NewOrEditNote"
 // FIXME: 04/01/22 textfield text below keyboard
 
 @Composable
-fun NewOrEditNoteScreen(
-    viewmodel: NewOrEditNoteViewmodel,
+fun NoteDetailScreen(
+    viewmodel: NoteDetailViewmodelImpl,
     onBack: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
@@ -152,7 +152,7 @@ fun NewOrEditNoteScreen(
 }
 
 private fun setEditingComplete(
-    viewmodel: NewOrEditNoteViewmodel,
+    viewmodel: NoteDetailViewmodelImpl,
     focusManager: FocusManager
 ) {
     viewmodel.setCurrentlyEditingState(None)

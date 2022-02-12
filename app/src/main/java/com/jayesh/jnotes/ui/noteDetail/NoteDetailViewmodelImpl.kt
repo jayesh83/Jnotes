@@ -1,4 +1,4 @@
-package com.jayesh.jnotes.ui.newOrEditNote
+package com.jayesh.jnotes.ui.noteDetail
 
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -15,8 +15,8 @@ import com.jayesh.jnotes.ui.models.Note
 import com.jayesh.jnotes.ui.models.NoteConfig
 import com.jayesh.jnotes.ui.models.NoteContent
 import com.jayesh.jnotes.ui.models.SyncStatus
-import com.jayesh.jnotes.ui.newOrEditNote.NewOrEditNoteViewmodel.Action.CREATE
-import com.jayesh.jnotes.ui.newOrEditNote.NewOrEditNoteViewmodel.Action.NOTHING
+import com.jayesh.jnotes.ui.noteDetail.NoteDetailViewmodelImpl.Action.CREATE
+import com.jayesh.jnotes.ui.noteDetail.NoteDetailViewmodelImpl.Action.NOTHING
 import com.jayesh.jnotes.ui.theme.BlackMuted
 import com.jayesh.jnotes.ui.theme.Blue200
 import com.jayesh.jnotes.ui.theme.Blue500
@@ -44,10 +44,10 @@ private const val TAG = "NewOrEditNoteViewmodel"
 const val UNDO_REDO_STACK_MAX_SIZE = 10
 
 @HiltViewModel
-class NewOrEditNoteViewmodel @Inject constructor(
+class NoteDetailViewmodelImpl @Inject constructor(
     private val repo: NotesRepo,
     savedStateHandle: SavedStateHandle
-) : INewOrEditNoteViewmodel() {
+) : NoteDetailViewmodel() {
 
     private var noteId: String? = null
     private var oldNote: Note? = null

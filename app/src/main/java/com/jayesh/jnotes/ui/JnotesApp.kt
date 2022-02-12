@@ -1,5 +1,6 @@
 package com.jayesh.jnotes.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -11,9 +12,10 @@ import androidx.navigation.navArgument
 import com.jayesh.jnotes.ui.Screen.NoteCreateNew
 import com.jayesh.jnotes.ui.Screen.NoteEdit
 import com.jayesh.jnotes.ui.Screen.Notes
-import com.jayesh.jnotes.ui.newOrEditNote.NewOrEditNoteScreen
-import com.jayesh.jnotes.ui.notesListing.NotesListingScreen
+import com.jayesh.jnotes.ui.noteDetail.NoteDetailScreen
+import com.jayesh.jnotes.ui.notes.NotesScreen
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun JnotesApp() {
     val navController: NavHostController = rememberNavController()
@@ -23,7 +25,7 @@ fun JnotesApp() {
         startDestination = Notes.route
     ) {
         composable(route = Notes.route) {
-            NotesListingScreen(
+            NotesScreen(
                 viewmodel = hiltViewModel(),
                 onAddNewNote = {
                     navController.navigate(NoteCreateNew.route)
@@ -38,7 +40,7 @@ fun JnotesApp() {
             route = NoteEdit.route,
             arguments = listOf(navArgument("noteId") { type = NavType.StringType })
         ) {
-            NewOrEditNoteScreen(
+            NoteDetailScreen(
                 viewmodel = hiltViewModel(),
                 onBack = {
                     navController.navigateUp()
@@ -49,7 +51,7 @@ fun JnotesApp() {
         composable(
             route = NoteCreateNew.route
         ) {
-            NewOrEditNoteScreen(
+            NoteDetailScreen(
                 viewmodel = hiltViewModel(),
                 onBack = {
                     navController.navigateUp()
