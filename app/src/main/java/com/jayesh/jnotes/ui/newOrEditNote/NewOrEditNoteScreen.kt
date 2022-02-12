@@ -181,5 +181,9 @@ fun BottomSheetBackgroundChangerPreview() {
         SingleColor(backgroundColor = Grey200, contentColor = Grey500),
         SingleColor(backgroundColor = Green200, contentColor = Green500)
     )
-    BottomSheetNoteBackgroundChanger(Modifier, availableSingleColorBackgrounds.random(), availableSingleColorBackgrounds) {}
+    BottomSheetNoteBackgroundChanger(
+        Modifier,
+        availableSingleColorBackgrounds.random(),
+        availableSingleColorBackgrounds
+    ) {}
 }

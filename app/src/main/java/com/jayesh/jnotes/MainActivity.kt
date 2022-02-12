@@ -31,7 +31,11 @@ class MainActivity : ComponentActivity() {
 
             SideEffect {
                 Log.e(TAG, "onCreate: SideEffect called")
-                systemUiController.setSystemBarsColor(color = Color.Transparent, isNavigationBarContrastEnforced = false, darkIcons = useDarkIcons)
+                systemUiController.setSystemBarsColor(
+                    color = Color.Transparent,
+                    isNavigationBarContrastEnforced = false,
+                    darkIcons = useDarkIcons
+                )
                 changeSystemBarsIconsColor(window, useDarkIcons)
             }
 

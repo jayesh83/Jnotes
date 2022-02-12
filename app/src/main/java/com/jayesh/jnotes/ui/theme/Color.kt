@@ -26,4 +26,15 @@ val Green500 = Color(0xFF6DA17A)
 val Orange500 = Color(0xFFFFBB00)
 
 val listOfLightBackgroundColors =
-    listOf(Blue200, Blue500, Parrot200, Parrot500, Pink200, Pink500, Grey200, Grey500, Green200, Green500)
+    listOf(
+        Blue200,
+        Blue500,
+        Parrot200,
+        Parrot500,
+        Pink200,
+        Pink500,
+        Grey200,
+        Grey500,
+        Green200,
+        Green500
+    )

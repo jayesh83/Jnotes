@@ -36,10 +36,7 @@ class NotesLocalDataSource @Inject constructor(
         Log.e(TAG, "getAllNotes() called")
         return notesDao.getAllNotes()
             .map { entitiesList ->
-                Log.d(TAG, "getAllNotes() notesDao.getAllNotes().map")
-                entitiesList
-                    .map { entity ->
-                    Log.d(TAG, "getAllNotes() entitiesList.map")
+                entitiesList.map { entity ->
                     mapper.mapToDomain(entity)
                 }
             }.flowOn(Dispatchers.IO)
