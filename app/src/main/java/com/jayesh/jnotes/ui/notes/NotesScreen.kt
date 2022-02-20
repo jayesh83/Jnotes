@@ -1,7 +1,5 @@
 package com.jayesh.jnotes.ui.notes
 
-import android.util.Log
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExtendedFloatingActionButton
 import androidx.compose.material.Icon
@@ -20,7 +18,6 @@ import com.jayesh.jnotes.R
 
 private const val TAG = "NotesListingScreen"
 
-@ExperimentalFoundationApi
 @Composable
 fun NotesScreen(
     viewmodel: NotesViewmodelImpl,
@@ -55,10 +52,9 @@ fun NotesScreen(
     ) {
         NoteList(
             notes = viewmodel.notes.collectAsState().value,
-            onItemClick = { noteId ->
-                Log.e(TAG, "NotesListingScreen: noteId: $noteId clicked")
-                onEditNote(noteId)
-            }
+            onItemClick = onEditNote,
+            scrollToTop = viewmodel.scrollToTop,
+            onScrolledToTop = { viewmodel.updateScrollToTop(false) }
         )
     }
 }

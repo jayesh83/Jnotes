@@ -1,67 +1,80 @@
 package com.jayesh.jnotes.ui.notes
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jayesh.jnotes.R
 import com.jayesh.jnotes.ui.models.Note
 import com.jayesh.jnotes.ui.models.NoteContent
 import com.jayesh.jnotes.util.timeAgo
 
-@ExperimentalFoundationApi //animateItemPlacement
 @Composable
-fun NoteList(notes: List<Note>, onItemClick: (String) -> Unit) {
-    LazyColumn {
+fun NoteList(
+    notes: List<Note>,
+    onItemClick: (String) -> Unit,
+    scrollToTop: Boolean,
+    onScrolledToTop: (() -> Unit)? = null
+) {
+    val listState = rememberLazyListState()
+    val currentOnScrolledToTop by rememberUpdatedState(newValue = onScrolledToTop)
+    val currentScrolledToTop by rememberUpdatedState(newValue = scrollToTop)
+
+    LaunchedEffect(key1 = currentScrolledToTop) {
+        if (currentScrolledToTop) {
+            Log.e("NoteList", "scrolling to top")
+            if (!listState.isScrollInProgress)
+                listState.scrollToItem(0)
+            currentOnScrolledToTop?.invoke()
+        }
+    }
+
+    LazyColumn(state = listState) {
+        item {
+            Spacer(modifier = Modifier.height(6.dp))
+        }
         itemsIndexed(
             items = notes,
             key = { _, note -> note.id },
             itemContent = { _, note ->
-                NoteItem(
-                    note = note,
-                    onItemClick = onItemClick,
-                    modifier = Modifier.animateItemPlacement(
-                        animationSpec = tween(
-                            durationMillis = 500,
-                            easing = LinearOutSlowInEasing,
-                        )
-                    )
-                )
+                SideEffect {
+                    Log.e("NoteItem", "composing, re-composing ${note.title}")
+                }
+                NoteItem(note = note, onItemClick = onItemClick)
             }
         )
     }
@@ -73,61 +86,54 @@ fun NoteItem(
     modifier: Modifier = Modifier,
     onItemClick: (String) -> Unit
 ) {
-    Surface(elevation = 2.dp,
+    Surface(
         modifier = modifier
-            .padding(8.dp)
-            .clip(RoundedCornerShape(8.dp))
+            .padding(horizontal = 14.dp, vertical = 4.dp)
+            .clip(RoundedCornerShape(16.dp))
             .clickable { onItemClick(note.id) }
-            .height(IntrinsicSize.Min)
+            .fillMaxWidth(),
+        color = MaterialTheme.colors.surface,
+        contentColor = MaterialTheme.colors.onSurface
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp)
+            modifier = Modifier.padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp)
         ) {
             if (!note.isTitleTextEmpty) {
                 Text(
                     text = note.title,
-                    style = if (!note.isContentTextEmpty) {
-                        MaterialTheme.typography.h6
-                    } else {
-                        MaterialTheme.typography.body1
-                    },
+                    style = if (!note.isContentTextEmpty) MaterialTheme.typography.h6
+                    else MaterialTheme.typography.body1,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 2,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 2.dp)
+                    modifier = Modifier.padding(end = 2.dp, top = 4.dp)
                 )
             }
             if (!note.isContentTextEmpty) {
                 Text(
                     text = note.content.text,
                     style = MaterialTheme.typography.body1,
-                    modifier = Modifier.padding(
-                        top = if (!note.isTitleTextEmpty) 8.dp else 0.dp
-                    ),
+                    modifier = Modifier
+                        .padding(top = 2.dp)
+                        .alpha(
+                            if (!note.isTitleTextEmpty) ContentAlpha.medium
+                            else ContentAlpha.high
+                        ),
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                Text(
-                    text = note.lastEdit.timeAgo(),
-                    style = MaterialTheme.typography.caption
-                )
-            }
+            Text(
+                text = note.lastEdit.timeAgo(),
+                style = MaterialTheme.typography.caption,
+                modifier = Modifier
+                    .padding(top = 6.dp, bottom = 8.dp)
+                    .alpha(ContentAlpha.disabled)
+            )
         }
-        Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .width(4.dp)
-                .background(color = MaterialTheme.colors.onSurface)
-        )
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xff9831f)
 @Composable
 fun NoteItemPreview() {
     NoteItem(
@@ -150,118 +156,104 @@ fun NoteItemPreviewNightMode() {
 }
 
 @Composable
-fun IndicatorChip(
+fun OutlinedLabel(
     modifier: Modifier = Modifier,
-    shape: Shape,
+    shape: Shape = RoundedCornerShape(12.dp),
     text: String,
     color: Color,
-    @DrawableRes icon: Int
+    allCapital: Boolean = false,
+    @DrawableRes icon: Int?
 ) {
     Surface(
-        modifier = modifier
-            .border(BorderStroke(1.dp, color), shape = shape)
-            .padding(2.dp),
-        color = Color.Transparent
+        modifier = modifier.border(BorderStroke(1.dp, color), shape = shape),
+        color = Color.Transparent,
+        contentColor = color
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                modifier = Modifier.padding(horizontal = 2.dp),
-                painter = painterResource(id = icon),
-                tint = color,
-                contentDescription = null
-            )
+        if (icon != null) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    modifier = Modifier
+                        .padding(horizontal = 2.dp)
+                        .requiredSize(12.dp, 12.dp),
+                    painter = painterResource(icon),
+                    contentDescription = null
+                )
+                Text(
+                    modifier = Modifier.padding(start = 2.dp, end = 4.dp),
+                    text = if (allCapital) text.uppercase() else text,
+                    style = MaterialTheme.typography.caption
+                )
+            }
+        } else {
             Text(
-                modifier = Modifier.padding(start = 2.dp, end = 4.dp),
-                text = text.uppercase(),
-                color = color,
+                text = if (allCapital) text.uppercase() else text,
+                style = MaterialTheme.typography.caption,
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
             )
         }
     }
 }
 
 @Composable
-fun FilledIndicatorChip(
+fun FilledLabel(
     modifier: Modifier = Modifier,
-    shape: Shape,
+    shape: Shape = RoundedCornerShape(12.dp),
     text: String,
-    backgroundColor: Color,
-    contentColor: Color
+    contentColor: Color,
+    backgroundColor: Color
 ) {
     Surface(
-        modifier = modifier.padding(4.dp),
+        modifier = modifier,
+        shape = shape,
         color = backgroundColor,
-        shape = shape
+        contentColor = contentColor
     ) {
         Text(
-            modifier = Modifier.padding(horizontal = 2.dp),
-            text = text.uppercase(),
-            color = contentColor
+            text = text,
+            style = MaterialTheme.typography.caption
+                .copy(fontWeight = FontWeight.SemiBold),
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
         )
     }
 }
 
 @Composable
-fun ExtraSessionFilledIndicatorChip(
+fun LabelNewNote(
     modifier: Modifier = Modifier,
-    shape: Shape = MaterialTheme.shapes.small,
-    text: String,
-    backgroundColor: Color = Color(0x80444444),
-    contentColor: Color = Color.White
+    shape: Shape = RoundedCornerShape(12.dp),
+    text: String = "new",
+    color: Color = Color(0xFF80E906),
+    allCapital: Boolean = true,
+    @DrawableRes icon: Int? = null
 ) {
-    FilledIndicatorChip(
+    OutlinedLabel(
         modifier = modifier,
         shape = shape,
         text = text,
-        backgroundColor = backgroundColor,
-        contentColor = contentColor
-    )
-}
-
-@Composable
-fun FillingFastIndicatorChip(
-    modifier: Modifier = Modifier,
-    shape: Shape = MaterialTheme.shapes.small,
-    text: String,
-    color: Color,
-    @DrawableRes icon: Int = R.drawable.ic_icon_filling_fast
-) {
-    IndicatorChip(
-        text = text,
         color = color,
-        icon = icon,
-        shape = shape,
-        modifier = modifier
+        allCapital = allCapital,
+        icon = icon
     )
 }
 
-/** Preview **/
-
-@Preview(showBackground = true)
+@Preview
 @Composable
-fun PreviewFillingFastIndicatorChip() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        FillingFastIndicatorChip(
-            text = "Filling Fast",
-            color = Color(0xff82d848),
-        )
-    }
+fun LabelNewNotePreview() {
+    LabelNewNote(
+        modifier = Modifier.padding(30.dp)
+    )
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
-fun PreviewExtraSessionFilledIndicatorChip() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        ExtraSessionFilledIndicatorChip(text = "Extra Session")
-    }
+fun FilledLabelPreview() {
+    FilledLabel(
+        modifier = Modifier.padding(30.dp),
+        text = "EMAIL",
+        contentColor = Color(0xFF424040),
+        backgroundColor = Color(0xFFFFFFFF),
+    )
 }
-

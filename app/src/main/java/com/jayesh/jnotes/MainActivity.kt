@@ -22,6 +22,7 @@ private const val TAG = "MainActivity"
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.setBackgroundDrawable(null)
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {

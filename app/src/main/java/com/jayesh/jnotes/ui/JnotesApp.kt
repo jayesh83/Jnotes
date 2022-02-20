@@ -1,6 +1,5 @@
 package com.jayesh.jnotes.ui
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -15,7 +14,6 @@ import com.jayesh.jnotes.ui.Screen.Notes
 import com.jayesh.jnotes.ui.noteDetail.NoteDetailScreen
 import com.jayesh.jnotes.ui.notes.NotesScreen
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun JnotesApp() {
     val navController: NavHostController = rememberNavController()

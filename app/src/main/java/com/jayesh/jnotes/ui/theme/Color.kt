@@ -6,8 +6,9 @@ val Purple200 = Color(0xFFBB86FC)
 val Purple500 = Color(0xFF6200EE)
 val Purple700 = Color(0xFF3700B3)
 val Teal200 = Color(0xFF03DAC5)
-val Grey100 = Color.Gray
-
+val Grey100 = Color(0xFFF5F5F5)
+val Grey900 = Color(0xFF212121)
+val Grey300 = Color(0xFFE0E0E0)
 
 // light background colors
 val WhiteMutated = Color(0xfff8f9fa)
