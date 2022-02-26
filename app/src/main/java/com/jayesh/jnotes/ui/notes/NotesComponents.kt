@@ -75,7 +75,7 @@ fun NoteList(
         item {
             Text(
                 text = stringResource(id = R.string.app_name),
-                style = MaterialTheme.typography.h4,
+                style = MaterialTheme.typography.h4.copy(color = MaterialTheme.colors.onSurface),
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 32.dp)
             )
         }
