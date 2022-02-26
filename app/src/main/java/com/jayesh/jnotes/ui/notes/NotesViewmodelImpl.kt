@@ -8,7 +8,7 @@ import com.jayesh.jnotes.data.repository.persistance.DbResult
 import com.jayesh.jnotes.ui.models.Note
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,7 +21,7 @@ class NotesViewmodelImpl @Inject constructor(
     private val repo: NotesRepo
 ) : NotesViewmodel() {
     private val _notes: MutableStateFlow<List<Note>> = MutableStateFlow(emptyList())
-    val notes: StateFlow<List<Note>> = _notes
+    val notes = _notes.asStateFlow()
 
     var scrollToTop: Boolean = false
         private set

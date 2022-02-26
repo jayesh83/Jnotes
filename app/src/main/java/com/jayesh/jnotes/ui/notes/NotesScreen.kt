@@ -1,6 +1,8 @@
 package com.jayesh.jnotes.ui.notes
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExtendedFloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
@@ -12,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
 import com.jayesh.jnotes.R
@@ -24,6 +27,7 @@ fun NotesScreen(
     onAddNewNote: () -> Unit,
     onEditNote: (noteId: String) -> Unit
 ) {
+    val listState = rememberLazyListState()
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -34,11 +38,13 @@ fun NotesScreen(
                 bottom = true
             ), // when in landscape mode, apply end edge navigation bar padding
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = stringResource(id = R.string.app_name))
-                }
-            )
+            if (listState.firstVisibleItemIndex > 0) {
+                TopAppBar(
+                    title = {
+                        Text(text = stringResource(id = R.string.app_name))
+                    }
+                )
+            }
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
@@ -52,6 +58,8 @@ fun NotesScreen(
     ) {
         NoteList(
             notes = viewmodel.notes.collectAsState().value,
+            contentPadding = PaddingValues(horizontal = 14.dp),
+            listState = listState,
             onItemClick = onEditNote,
             scrollToTop = viewmodel.scrollToTop,
             onScrolledToTop = { viewmodel.updateScrollToTop(false) }
