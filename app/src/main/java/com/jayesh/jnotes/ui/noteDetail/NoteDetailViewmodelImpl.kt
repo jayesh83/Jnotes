@@ -5,12 +5,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.jayesh.jnotes.data.repository.NotesRepo
-import com.jayesh.jnotes.data.repository.persistance.DbResult
 import com.jayesh.jnotes.ui.models.Note
 import com.jayesh.jnotes.ui.noteDetail.NoteDetailViewmodelImpl.Action.CREATE
 import com.jayesh.jnotes.ui.noteDetail.NoteDetailViewmodelImpl.Action.NOTHING
@@ -88,8 +86,7 @@ class NoteDetailViewmodelImpl @Inject constructor(
         this.oldNote = oldNote
         titleTextFieldState = titleTextFieldState.copy(text = oldNote.title)
         noteTextFieldState = noteTextFieldState.copy(
-            text = oldNote.content.text,
-            selection = TextRange(oldNote.content.text.length)
+            text = oldNote.content.text
         )
         selectedBackgroundType = BackgroundType.SingleColor(
             backgroundColor = oldNote.config.backgroundColor,
@@ -188,14 +185,12 @@ class NoteDetailViewmodelImpl @Inject constructor(
     fun updateNoteIfNeeded() {
         val decision = whatToDoWithThisNote()
         if (decision in arrayOf(CREATE, Action.UPDATE, Action.DELETE)) {
-            viewModelScope.launch(Dispatchers.IO) {
-                if (decision == CREATE)
-                    saveNote(getUpdatedNote())
-                if (decision == Action.UPDATE)
-                    noteId?.let { noteId -> updateNote(noteId, getUpdatedNote()) }
-                if (decision == Action.DELETE)
-                    noteId?.let { noteId -> deleteNote(noteId) }
-            }
+            if (decision == CREATE)
+                saveNote(getUpdatedNote())
+            if (decision == Action.UPDATE)
+                noteId?.let { noteId -> updateNote(noteId, getUpdatedNote()) }
+            if (decision == Action.DELETE)
+                noteId?.let { noteId -> deleteNote(noteId) }
         }
         Log.e(TAG, "updateNoteIfNeeded: decision: ${decision.name}")
     }
@@ -241,28 +236,25 @@ class NoteDetailViewmodelImpl @Inject constructor(
     }
 
 
-    override suspend fun saveNote(note: Note): DbResult {
-        return repo.saveNote(note)
+    override fun saveNote(note: Note) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repo.saveNote(note)
+        }
     }
 
-    override suspend fun getNote(id: String): Note? {
-        return repo.getNote(id)
+    override fun updateNote(id: String, note: Note) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repo.editNote(id, note)
+        }
     }
 
-    override suspend fun updateNote(id: String, note: Note): DbResult {
-        return repo.editNote(id, note)
-    }
-
-    override suspend fun deleteNote(id: String): DbResult {
-        return repo.deleteNote(id)
+    override fun deleteNote(id: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repo.deleteNote(id)
+        }
     }
 
     private fun randomId() = UUID.randomUUID()?.toString() ?: System.currentTimeMillis().toString()
-
-    override fun onCleared() {
-        super.onCleared()
-        Log.e(TAG, "NewOrEditNoteViewmodel onCleared")
-    }
 
     enum class Action {
         CREATE, UPDATE, DELETE, NOTHING
