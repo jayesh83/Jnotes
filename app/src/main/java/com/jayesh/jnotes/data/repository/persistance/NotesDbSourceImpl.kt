@@ -1,9 +1,8 @@
 package com.jayesh.jnotes.data.repository.persistance
 
 import android.util.Log
-import com.jayesh.jnotes.data.repository.persistance.model.NoteLocalEntity
+import com.jayesh.jnotes.data.repository.persistance.mapper.NoteMapper
 import com.jayesh.jnotes.ui.models.Note
-import com.jayesh.jnotes.util.EntityMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -14,7 +13,7 @@ private const val TAG = "NotesLocalDataSource"
 
 class NotesDbSourceImpl @Inject constructor(
     private val notesDao: NotesDao,
-    private val mapper: EntityMapper<NoteLocalEntity, Note>
+    private val mapper: NoteMapper
 ) : NotesDbSource {
 
     override suspend fun saveNote(note: Note): DbResult {

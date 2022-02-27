@@ -40,7 +40,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jayesh.jnotes.R
 import com.jayesh.jnotes.ui.models.Note
-import com.jayesh.jnotes.ui.models.NoteContent
 import com.jayesh.jnotes.ui.theme.JnotesTheme
 import com.jayesh.jnotes.util.timeAgo
 
@@ -238,7 +237,7 @@ fun NoteItemPreview() {
             NoteItem(
                 Note(
                     title = "Jetpack compose",
-                    content = NoteContent("Currently learning jetpack compose in android")
+                    content = Note.NoteContent("Currently learning jetpack compose in android")
                 )
             ) {}
         }
@@ -257,7 +256,7 @@ fun NoteItemPreviewNightMode() {
             NoteItem(
                 Note(
                     title = "Jetpack compose in dark",
-                    content = NoteContent("Currently learning jetpack compose in android")
+                    content = Note.NoteContent("Currently learning jetpack compose in android")
                 )
             ) {}
         }

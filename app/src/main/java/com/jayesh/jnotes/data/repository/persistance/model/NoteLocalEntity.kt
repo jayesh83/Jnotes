@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.google.gson.Gson
-import com.jayesh.jnotes.ui.models.SyncStatus
+import com.jayesh.jnotes.ui.models.Note
 
 @Entity(tableName = "note")
 @TypeConverters(Converters::class)
@@ -29,40 +29,38 @@ data class NoteLocalEntity(
 
     @ColumnInfo(name = "created_at")
     val createdAt: Long
-)
+) {
+    /** Note can contain text, picture, video, drawing, voice recording, etc in future  **/
+    data class NoteContentLocalEntity(val text: String)
 
-/** Note can contain text, picture, video, drawing, voice recording, etc  **/
-data class NoteContentLocalEntity(
-    val text: String
-)
-
-data class NoteConfigLocalEntity(
-    /** argb hex color code **/
-    val backgroundColor: Int,
-    val contentColor: Int,
-    val syncStatus: SyncStatus
-)
+    data class NoteConfigLocalEntity(
+        /** argb hex color code **/
+        val backgroundColor: Int,
+        val contentColor: Int,
+        val syncStatus: Note.SyncStatus
+    )
+}
 
 class Converters {
     // ---- note content
     @TypeConverter
-    fun noteContentToString(content: NoteContentLocalEntity): String {
+    fun noteContentToString(content: NoteLocalEntity.NoteContentLocalEntity): String {
         return content.text
     }
 
     @TypeConverter
-    fun fromStringToNoteContent(value: String): NoteContentLocalEntity {
-        return NoteContentLocalEntity(value)
+    fun fromStringToNoteContent(value: String): NoteLocalEntity.NoteContentLocalEntity {
+        return NoteLocalEntity.NoteContentLocalEntity(value)
     }
 
     // ---- note config
     @TypeConverter
-    fun noteConfigToString(config: NoteConfigLocalEntity): String {
+    fun noteConfigToString(config: NoteLocalEntity.NoteConfigLocalEntity): String {
         return Gson().toJson(config)
     }
 
     @TypeConverter
-    fun fromNoteConfig(value: String): NoteConfigLocalEntity {
-        return Gson().fromJson(value, NoteConfigLocalEntity::class.java)
+    fun fromNoteConfig(value: String): NoteLocalEntity.NoteConfigLocalEntity {
+        return Gson().fromJson(value, NoteLocalEntity.NoteConfigLocalEntity::class.java)
     }
 }

@@ -15,42 +15,42 @@ data class Note(
 ) {
     val isTitleTextEmpty get() = title.isBlank()
     val isContentTextEmpty get() = content.text.isBlank()
-}
 
-/** Note can contain text, picture, video, drawing, voice recording, etc  **/
-data class NoteContent(
-    val text: String
-) {
-    companion object {
-        val DEFAULT = NoteContent(text = "")
+    /** Note can contain text, picture, video, drawing, voice recording, etc  **/
+    data class NoteContent(
+        val text: String
+    ) {
+        companion object {
+            val DEFAULT = NoteContent(text = "")
+        }
     }
-}
 
-data class NoteConfig(
-    /** argb hex color code **/
-    val backgroundColor: Color,
-    val contentColor: Color,
-    val syncStatus: SyncStatus
-) {
-    val isSynced get() = syncStatus == SyncStatus.SYNCED
+    data class NoteConfig(
+        /** argb hex color code **/
+        val backgroundColor: Color,
+        val contentColor: Color,
+        val syncStatus: SyncStatus
+    ) {
+        val isSynced get() = syncStatus == SyncStatus.SYNCED
 
-    companion object {
-        val DEFAULT = NoteConfig(
-            backgroundColor = WhiteMutated,
-            contentColor = BlackMuted,
-            syncStatus = SyncStatus.NOT_SYNCED
-        )
+        companion object {
+            val DEFAULT = NoteConfig(
+                backgroundColor = WhiteMutated,
+                contentColor = BlackMuted,
+                syncStatus = SyncStatus.NOT_SYNCED
+            )
+        }
     }
-}
 
-enum class SyncStatus(val status: Int) {
-    NOT_SYNCED(-1),
-    SYNC_FAILED(0),
-    SYNCED(1);
+    enum class SyncStatus(val status: Int) {
+        NOT_SYNCED(-1),
+        SYNC_FAILED(0),
+        SYNCED(1);
 
-    companion object {
-        fun fromInt(status: Int): SyncStatus? {
-            return values().find { it.status == status }
+        companion object {
+            fun fromInt(status: Int): SyncStatus? {
+                return values().find { it.status == status }
+            }
         }
     }
 }

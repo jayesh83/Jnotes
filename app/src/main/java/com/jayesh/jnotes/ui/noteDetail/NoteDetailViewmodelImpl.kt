@@ -12,9 +12,6 @@ import androidx.lifecycle.viewModelScope
 import com.jayesh.jnotes.data.repository.NotesRepo
 import com.jayesh.jnotes.data.repository.persistance.DbResult
 import com.jayesh.jnotes.ui.models.Note
-import com.jayesh.jnotes.ui.models.NoteConfig
-import com.jayesh.jnotes.ui.models.NoteContent
-import com.jayesh.jnotes.ui.models.SyncStatus
 import com.jayesh.jnotes.ui.noteDetail.NoteDetailViewmodelImpl.Action.CREATE
 import com.jayesh.jnotes.ui.noteDetail.NoteDetailViewmodelImpl.Action.NOTHING
 import com.jayesh.jnotes.ui.theme.BlackMuted
@@ -223,11 +220,11 @@ class NoteDetailViewmodelImpl @Inject constructor(
 
     private fun getUpdatedNote() = Note(
         title = titleTextFieldState.text,
-        content = NoteContent(noteTextFieldState.text),
-        config = NoteConfig(
+        content = Note.NoteContent(noteTextFieldState.text),
+        config = Note.NoteConfig(
             backgroundColor = selectedBackgroundType.backgroundColor,
             contentColor = selectedBackgroundType.contentColor,
-            syncStatus = SyncStatus.NOT_SYNCED
+            syncStatus = Note.SyncStatus.NOT_SYNCED
         ),
         id = noteId ?: randomId()
     )
