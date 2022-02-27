@@ -1,7 +1,9 @@
 package com.jayesh.jnotes.ui.notes
 
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -41,10 +44,22 @@ fun NotesScreen(
         targetState = listState.firstVisibleItemIndex > 0,
         label = "App bar"
     )
-    val topBarAlpha = appBarTransition.animateFloat(label = "Appbar offset") { firstItemInvisible ->
+
+    val topBarAlpha by appBarTransition.animateFloat(
+        transitionSpec = {
+            tween(easing = FastOutSlowInEasing)
+        },
+        label = "Appbar offset"
+    ) { firstItemInvisible ->
         if (firstItemInvisible) 1f else 0f
     }
-    val topBarHeight = appBarTransition.animateDp(label = "appbar height") { firstItemInvisible ->
+
+    val topBarHeight by appBarTransition.animateDp(
+        transitionSpec = {
+            tween(easing = FastOutSlowInEasing)
+        },
+        label = "appbar height"
+    ) { firstItemInvisible ->
         if (firstItemInvisible) appBarHeight else 0.dp
     }
 
@@ -61,8 +76,8 @@ fun NotesScreen(
         TopAppBar(
             title = { Text(text = stringResource(id = R.string.app_name)) },
             modifier = Modifier
-                .alpha(topBarAlpha.value)
-                .height(topBarHeight.value)
+                .alpha(topBarAlpha)
+                .height(topBarHeight)
                 .align(Alignment.TopCenter)
                 .zIndex(1f)
         )
