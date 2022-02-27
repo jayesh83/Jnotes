@@ -2,12 +2,15 @@ package com.jayesh.jnotes.ui.noteDetail
 
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
 import com.jayesh.jnotes.ui.noteDetail.BackgroundType.SingleColor
@@ -67,7 +71,7 @@ fun NoteDetailScreen(
         backgroundColor = viewmodel.selectedBackgroundType.backgroundColor,
         contentColor = viewmodel.selectedBackgroundType.contentColor
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .background(MaterialTheme.colors.background)
                 .fillMaxSize()
@@ -76,76 +80,83 @@ fun NoteDetailScreen(
                     start = true,
                     end = true,
                     bottom = false
-                ) // when in landscape mode, apply end edge navigation bar padding
+                )  // when in landscape mode, apply end edge navigation bar padding) {
         ) {
-            Crossfade(viewmodel.currentlyEditing, animationSpec = spring()) { currentlyEditing ->
-                when (currentlyEditing) {
-                    Title -> {
-                        TopAppBarWhenEditingTitle(
-                            onBack = { onBackPress() },
-                            onEditingComplete = {
-                                setEditingComplete(viewmodel, focusManager)
-                            }
-                        )
-                    }
-                    Note -> {
-                        TopAppBarWhenEditingContent(
-                            onBack = { onBackPress() },
-                            enableUndo = viewmodel.enableUndo,
-                            onUndo = viewmodel::undo,
-                            enableRedo = viewmodel.enableRedo,
-                            onRedo = viewmodel::redo,
-                            onEditingComplete = {
-                                setEditingComplete(viewmodel, focusManager)
-                            }
-                        )
-                    }
-                    None -> {
-                        TopAppBarWhenEditingNone(
-                            onBack = { onBackPress() },
-                            onShare = {},
-                            onChangeNoteBackground = viewmodel::toggleNoteBackgroundChangerState
-                        )
+            Column {
+                Crossfade(
+                    targetState = viewmodel.currentlyEditing,
+                    animationSpec = spring()
+                ) { currentlyEditing ->
+                    when (currentlyEditing) {
+                        Title -> {
+                            TopAppBarWhenEditingTitle(
+                                onBack = { onBackPress() },
+                                onEditingComplete = {
+                                    setEditingComplete(viewmodel, focusManager)
+                                }
+                            )
+                        }
+                        Note -> {
+                            TopAppBarWhenEditingContent(
+                                onBack = { onBackPress() },
+                                enableUndo = viewmodel.enableUndo,
+                                onUndo = viewmodel::undo,
+                                enableRedo = viewmodel.enableRedo,
+                                onRedo = viewmodel::redo,
+                                onEditingComplete = {
+                                    setEditingComplete(viewmodel, focusManager)
+                                }
+                            )
+                        }
+                        None -> {
+                            TopAppBarWhenEditingNone(
+                                onBack = { onBackPress() },
+                                onShare = {},
+                                onChangeNoteBackground = viewmodel::toggleNoteBackgroundChangerState
+                            )
+                        }
                     }
                 }
+                TitleTextField(
+                    textFieldValue = viewmodel.titleTextFieldState,
+                    onTitleChange = viewmodel::setOnTitleChange,
+                    isFocused = viewmodel.currentlyEditing == Title,
+                    onFocusChanged = {
+                        if (it.isFocused) {
+                            viewmodel.setCurrentlyEditingState(Title)
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(start = 28.dp, end = 28.dp, bottom = 16.dp)
+                        .fillMaxWidth()
+                )
+                NoteTextField(
+                    textFieldValue = viewmodel.noteTextFieldState,
+                    onNoteChange = viewmodel::setOnNoteChange,
+                    isFocused = viewmodel.currentlyEditing == Note,
+                    onFocusChanged = {
+                        if (it.isFocused) {
+                            viewmodel.setCurrentlyEditingState(Note)
+                        }
+                    },
+                    shouldPadToNavigationBars = viewmodel.noteBackgroundChangerBottomSheetVisible,
+                    onSoftKeyboardDismissed = {
+                        viewmodel.setCurrentlyEditingState(None)
+                    },
+                    modifier = Modifier
+                        .padding(start = 28.dp, top = 8.dp, end = 28.dp)
+                        .fillMaxSize()
+                )
             }
-            Box {
-                Column(
-                    modifier = Modifier.align(Alignment.TopStart)
-                ) {
-                    TitleTextField(
-                        textFieldValue = viewmodel.titleTextFieldState,
-                        onTitleChange = viewmodel::setOnTitleChange,
-                        isFocused = viewmodel.currentlyEditing == Title,
-                        onFocusChanged = {
-                            if (it.isFocused) {
-                                viewmodel.setCurrentlyEditingState(Title)
-                            }
-                        }
-                    )
-                    NoteTextField(
-                        textFieldValue = viewmodel.noteTextFieldState,
-                        onNoteChange = viewmodel::setOnNoteChange,
-                        isFocused = viewmodel.currentlyEditing == Note,
-                        onFocusChanged = {
-                            if (it.isFocused) {
-                                viewmodel.setCurrentlyEditingState(Note)
-                            }
-                        },
-                        shouldPadToNavigationBars = viewmodel.noteBackgroundChangerBottomSheetVisible,
-                        onSoftKeyboardDismissed = {
-                            viewmodel.setCurrentlyEditingState(None)
-                        }
-                    )
-                }
-                if (viewmodel.noteBackgroundChangerBottomSheetVisible) {
-                    BottomSheetNoteBackgroundChanger(
-                        modifier = Modifier.align(Alignment.BottomCenter),
-                        selectedBackground = viewmodel.selectedBackgroundType,
-                        onBackgroundSelected = viewmodel::setOnBackgroundChange,
-                        backgroundList = viewmodel.availableSingleColorBackgrounds()
-                    )
-                }
+            AnimatedVisibility(
+                visible = viewmodel.noteBackgroundChangerBottomSheetVisible,
+                modifier = Modifier.align(Alignment.BottomCenter)
+            ) {
+                BottomSheetNoteBackgroundChanger(
+                    selectedBackground = viewmodel.selectedBackgroundType,
+                    onBackgroundSelected = viewmodel::setOnBackgroundChange,
+                    backgroundList = viewmodel.availableSingleColorBackgrounds()
+                )
             }
         }
     }

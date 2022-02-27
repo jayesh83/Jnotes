@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -200,6 +199,7 @@ fun TitleTextField(
     onTitleChange: (TextFieldValue) -> Unit,
     isFocused: Boolean,
     onFocusChanged: (FocusState) -> Unit,
+    modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colors.background,
     contentColor: Color = contentColorFor(backgroundColor = backgroundColor),
 ) {
@@ -225,10 +225,8 @@ fun TitleTextField(
         BasicTextField(
             value = textFieldValue,
             onValueChange = onTitleChange,
-            modifier = Modifier
+            modifier = modifier
                 .background(backgroundColor)
-                .padding(start = 28.dp, end = 28.dp, bottom = 16.dp)
-                .fillMaxWidth()
                 .focusRequester(focusRequester)
                 .onFocusChanged { currentFocusChanged(it) },
             textStyle = commonTextStyle,
@@ -257,6 +255,7 @@ fun NoteTextField(
     onNoteChange: (TextFieldValue) -> Unit,
     isFocused: Boolean,
     onFocusChanged: (FocusState) -> Unit,
+    modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colors.background,
     contentColor: Color = contentColorFor(backgroundColor = backgroundColor),
     shouldPadToNavigationBars: Boolean = false,
@@ -290,15 +289,13 @@ fun NoteTextField(
         BasicTextField(
             value = textFieldValue,
             onValueChange = onNoteChange,
-            modifier = Modifier
-                .background(backgroundColor)
-                .padding(start = 28.dp, top = 8.dp, end = 28.dp)
+            modifier = modifier
                 .navigationBarsPadding(
                     bottom = currentShouldPadToNavigationBars,
                     start = false,
                     end = false
                 )
-                .fillMaxSize()
+                .background(backgroundColor)
                 .focusRequester(focusRequester)
                 .onFocusChanged { currentFocusChanged(it) }
                 .clearFocusOnKeyboardDismiss(onSoftKeyboardDismissed),
