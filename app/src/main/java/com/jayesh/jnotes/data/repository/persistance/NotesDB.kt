@@ -12,7 +12,8 @@ private const val TAG = "NotesDB"
 
 @Database(
     entities = [NoteLocalEntity::class],
-    version = 1
+    version = 1,
+    exportSchema = false
 )
 abstract class NotesDB : RoomDatabase() {
     abstract fun notesDao(): NotesDao
