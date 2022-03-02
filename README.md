@@ -13,3 +13,7 @@ Pending work:
 4. Share as Image, text
 
 Preview:
+
+
+https://user-images.githubusercontent.com/40509714/156426677-ff76108d-a76e-40a2-9311-7a9599e85040.mp4
+
