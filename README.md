@@ -11,3 +11,5 @@ Pending work:
 2. Have rich text styling e.g. mardkdown
 3. Searching, sorting, filters based on tag
 4. Share as Image, text
+
+Preview:
