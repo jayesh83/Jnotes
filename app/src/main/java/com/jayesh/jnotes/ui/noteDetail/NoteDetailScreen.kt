@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.insets.navigationBarsWithImePadding
 import com.google.accompanist.insets.statusBarsPadding
 import com.jayesh.jnotes.ui.noteDetail.BackgroundType.SingleColor
 import com.jayesh.jnotes.ui.noteDetail.CurrentlyEditing.None
@@ -146,6 +147,7 @@ fun NoteDetailScreen(
                     modifier = Modifier
                         .padding(start = 28.dp, top = 8.dp, end = 28.dp)
                         .fillMaxSize()
+                        .navigationBarsWithImePadding()
                 )
             }
             AnimatedVisibility(
