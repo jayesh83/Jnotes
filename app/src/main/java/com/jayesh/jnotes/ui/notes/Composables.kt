@@ -3,6 +3,9 @@ package com.jayesh.jnotes.ui.notes
 import android.content.res.Configuration
 import android.util.Log
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -19,29 +22,48 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jayesh.jnotes.R
+import com.jayesh.jnotes.ui.clearFocusOnKeyboardDismiss
 import com.jayesh.jnotes.ui.models.Note
 import com.jayesh.jnotes.ui.theme.JnotesTheme
 import com.jayesh.jnotes.util.timeAgo
@@ -71,14 +93,29 @@ fun NoteList(
     LazyColumn(
         state = listState,
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
         contentPadding = contentPadding
     ) {
         item {
             Text(
                 text = stringResource(id = R.string.app_name),
                 style = MaterialTheme.typography.h4.copy(color = MaterialTheme.colors.onSurface),
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 32.dp)
+                modifier = Modifier.padding(horizontal = 18.dp, vertical = 32.dp)
+            )
+        }
+        item {
+            var searchText by rememberSaveable { mutableStateOf("") }
+            SearchComponent(
+                modifier = Modifier.padding(start = 14.dp, end = 14.dp, bottom = 14.dp),
+                text = searchText,
+                onTextChange = { changedText ->
+                    if (changedText.length == 1 && changedText.isBlank()) {
+                        searchText = ""
+                    } else {
+                        searchText = changedText
+                    }
+                },
+                onClearClick = { searchText = "" }
             )
         }
         itemsIndexed(
@@ -147,6 +184,70 @@ fun NoteItem(
                     .padding(top = 6.dp, bottom = 8.dp)
                     .alpha(ContentAlpha.disabled)
             )
+        }
+    }
+}
+
+@Composable
+fun SearchComponent(
+    text: String,
+    onTextChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    onClearClick: () -> Unit,
+    placeholderText: String = stringResource(id = R.string.search_notes)
+) {
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+    val textIsBlank by derivedStateOf { text.isBlank() }
+
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(50)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(10.dp)
+        ) {
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search icon",
+                    modifier = Modifier.requiredSize(20.dp)
+                )
+                BasicTextField(
+                    value = text,
+                    onValueChange = onTextChange,
+                    textStyle = MaterialTheme.typography.subtitle1,
+                    singleLine = true,
+                    modifier = Modifier
+                        .weight(1f)
+                        .focusRequester(focusRequester)
+                        .clearFocusOnKeyboardDismiss(),
+                    decorationBox = {
+                        if (textIsBlank) {
+                            Text(
+                                text = placeholderText,
+                                style = MaterialTheme.typography.subtitle1
+                            )
+                        }
+                        it()
+                    },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = { focusManager.clearFocus(true) }
+                    )
+                )
+                AnimatedVisibility(
+                    visible = textIsBlank.not(),
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    IconButton(onClick = onClearClick, modifier = Modifier.requiredSize(20.dp)) {
+                        Icon(imageVector = Icons.Default.Clear, contentDescription = "Clear icon")
+                    }
+                }
+            }
         }
     }
 }
