@@ -2,6 +2,7 @@ package com.jayesh.jnotes.data.repository.persistance
 
 import android.util.Log
 import com.jayesh.jnotes.data.repository.persistance.mapper.NoteMapper
+import com.jayesh.jnotes.data.repository.persistance.model.NoteLocalEntityMatchInfo
 import com.jayesh.jnotes.ui.models.Note
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -49,5 +50,12 @@ class NotesDbSourceImpl @Inject constructor(
     override suspend fun deleteNote(id: String): DbResult {
         notesDao.deleteNote(id)
         return DbResult.Success
+    }
+
+    override suspend fun searchNotes(query: String): List<Note> {
+        val noteEntitiesMatchInfo: List<NoteLocalEntityMatchInfo> = notesDao.searchNotes(query)
+        return noteEntitiesMatchInfo.sortedByDescending {
+            OkapiBM25.score(it.matchInfo, column = 0)
+        }.map { mapper.mapToDomain(it.noteLocalEntity) }
     }
 }

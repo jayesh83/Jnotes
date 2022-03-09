@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -44,6 +45,24 @@ class NotesViewmodelImpl @Inject constructor(
 
     override suspend fun deleteNote(id: String): DbResult {
         return repo.deleteNote(id)
+    }
+
+    override fun searchNotes(query: String) {
+        viewModelScope.launch {
+            val matchedNotes = if (query.length > 1) {
+                repo.searchNotes(sanitizeSearchQuery(query))
+            } else {
+                repo.getAllNotes().firstOrNull() ?: emptyList()
+            }
+            _notes.emit(matchedNotes)
+        }
+    }
+
+    /** FTS(Full text search) query needs to be escaped properly as certain special characters in query, may
+     * lead to FTS operations e.g. "-9" search query is treated as (NOT operator 9) **/
+    private fun sanitizeSearchQuery(query: String): String {
+        val queryWithEscapedQuotes = query.replace(Regex.fromLiteral("\""), "\"\"")
+        return "*\"$queryWithEscapedQuotes\"*"
     }
 
     override fun onCleared() {

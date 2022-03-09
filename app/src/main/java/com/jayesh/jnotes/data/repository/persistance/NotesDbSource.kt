@@ -9,6 +9,7 @@ interface NotesDbSource {
     fun getAllNotes(): Flow<List<Note>>
     suspend fun editNote(id: String, note: Note): DbResult
     suspend fun deleteNote(id: String): DbResult
+    suspend fun searchNotes(query: String): List<Note>
 }
 
 enum class DbResult {

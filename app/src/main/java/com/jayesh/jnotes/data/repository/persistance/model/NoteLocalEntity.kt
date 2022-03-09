@@ -1,27 +1,26 @@
 package com.jayesh.jnotes.data.repository.persistance.model
 
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
-import androidx.room.TypeConverters
 import com.google.gson.Gson
 import com.jayesh.jnotes.ui.models.Note
 
 @Entity(tableName = "note")
-@TypeConverters(Converters::class)
 data class NoteLocalEntity(
     @ColumnInfo(name = "title")
     val title: String,
 
-    @ColumnInfo(name = "content")
+    @Embedded
     val content: NoteContentLocalEntity,
 
     @ColumnInfo(name = "id")
     @PrimaryKey
     val id: String,
 
-    @ColumnInfo(name = "config")
+    @Embedded
     val config: NoteConfigLocalEntity,
 
     @ColumnInfo(name = "last_edit")
@@ -31,12 +30,20 @@ data class NoteLocalEntity(
     val createdAt: Long
 ) {
     /** Note can contain text, picture, video, drawing, voice recording, etc in future  **/
-    data class NoteContentLocalEntity(val text: String)
+    data class NoteContentLocalEntity(
+        @ColumnInfo(name = "text")
+        val text: String
+    )
 
     data class NoteConfigLocalEntity(
         /** argb hex color code **/
+        @ColumnInfo(name = "backgroundColor")
         val backgroundColor: Int,
+
+        @ColumnInfo(name = "contentColor")
         val contentColor: Int,
+
+        @ColumnInfo(name = "syncStatus")
         val syncStatus: Note.SyncStatus
     )
 }

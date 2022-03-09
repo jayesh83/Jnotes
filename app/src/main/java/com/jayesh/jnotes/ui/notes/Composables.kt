@@ -25,6 +25,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -53,6 +55,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -62,6 +65,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.jayesh.jnotes.R
 import com.jayesh.jnotes.ui.clearFocusOnKeyboardDismiss
 import com.jayesh.jnotes.ui.models.Note
@@ -80,6 +84,14 @@ fun NoteList(
 ) {
     val currentOnScrolledToTop by rememberUpdatedState(newValue = onScrolledToTop)
     val currentScrolledToTop by rememberUpdatedState(newValue = scrollToTop)
+
+    val notesViewModel: NotesViewmodelImpl = hiltViewModel()
+
+    var searchText by rememberSaveable { mutableStateOf("") }
+
+    LaunchedEffect(key1 = searchText) {
+        notesViewModel.searchNotes(searchText)
+    }
 
     LaunchedEffect(key1 = currentScrolledToTop) {
         if (currentScrolledToTop) {
@@ -104,7 +116,6 @@ fun NoteList(
             )
         }
         item {
-            var searchText by rememberSaveable { mutableStateOf("") }
             SearchComponent(
                 modifier = Modifier.padding(start = 14.dp, end = 14.dp, bottom = 14.dp),
                 text = searchText,
@@ -194,7 +205,8 @@ fun SearchComponent(
     onTextChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     onClearClick: () -> Unit,
-    placeholderText: String = stringResource(id = R.string.search_notes)
+    placeholderText: String = stringResource(id = R.string.search_notes),
+    contentColor: Color = MaterialTheme.colors.onSurface
 ) {
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
@@ -204,46 +216,61 @@ fun SearchComponent(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(50)
     ) {
+        val customTextSelectionColors = remember(key1 = contentColor) {
+            TextSelectionColors(
+                handleColor = contentColor,
+                backgroundColor = contentColor.copy(alpha = 0.2f)
+            )
+        }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.padding(10.dp)
         ) {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
                 Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = "Search icon",
                     modifier = Modifier.requiredSize(20.dp)
                 )
-                BasicTextField(
-                    value = text,
-                    onValueChange = onTextChange,
-                    textStyle = MaterialTheme.typography.subtitle1,
-                    singleLine = true,
-                    modifier = Modifier
-                        .weight(1f)
-                        .focusRequester(focusRequester)
-                        .clearFocusOnKeyboardDismiss(),
-                    decorationBox = {
-                        if (textIsBlank) {
-                            Text(
-                                text = placeholderText,
-                                style = MaterialTheme.typography.subtitle1
-                            )
-                        }
-                        it()
-                    },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(
-                        onDone = { focusManager.clearFocus(true) }
+                CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
+                    BasicTextField(
+                        value = text,
+                        onValueChange = onTextChange,
+                        textStyle = MaterialTheme.typography.subtitle1.copy(color = contentColor),
+                        singleLine = true,
+                        cursorBrush = SolidColor(contentColor),
+                        modifier = Modifier
+                            .weight(1f)
+                            .focusRequester(focusRequester)
+                            .clearFocusOnKeyboardDismiss(),
+                        decorationBox = {
+                            if (textIsBlank) {
+                                Text(
+                                    text = placeholderText,
+                                    style = MaterialTheme.typography.subtitle1
+                                )
+                            }
+                            it()
+                        },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(
+                            onDone = { focusManager.clearFocus(true) }
+                        )
                     )
-                )
+                }
+                // TODO: use shrink, expand animation instead using animation chaining
                 AnimatedVisibility(
                     visible = textIsBlank.not(),
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {
-                    IconButton(onClick = onClearClick, modifier = Modifier.requiredSize(20.dp)) {
+                    IconButton(
+                        onClick = onClearClick,
+                        modifier = Modifier
+                            .requiredSize(20.dp)
+                            .padding(end = 4.dp)
+                    ) {
                         Icon(imageVector = Icons.Default.Clear, contentDescription = "Clear icon")
                     }
                 }

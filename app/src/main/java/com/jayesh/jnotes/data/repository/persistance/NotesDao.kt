@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
 import androidx.room.Update
 import com.jayesh.jnotes.data.repository.persistance.model.NoteLocalEntity
+import com.jayesh.jnotes.data.repository.persistance.model.NoteLocalEntityMatchInfo
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -28,4 +29,14 @@ interface NotesDao {
     /** Delete **/
     @Query("DELETE FROM note WHERE id = :noteId")
     suspend fun deleteNote(noteId: String): Int
+
+    @Query(
+        """
+        SELECT *, matchInfo(note_fts) as matchInfo 
+        FROM note
+        JOIN note_fts ON note.id = note_fts.id
+        WHERE note_fts MATCH :query
+        """
+    )
+    suspend fun searchNotes(query: String): List<NoteLocalEntityMatchInfo>
 }

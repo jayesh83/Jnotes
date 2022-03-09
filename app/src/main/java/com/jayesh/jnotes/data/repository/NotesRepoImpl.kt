@@ -32,6 +32,10 @@ class NotesRepoImpl @Inject constructor(
         return persistence.deleteNote(id)
     }
 
+    override suspend fun searchNotes(query: String): List<Note> {
+        return persistence.searchNotes(query)
+    }
+
     override fun syncNote(note: Note) {
         TODO("Not yet implemented")
     }

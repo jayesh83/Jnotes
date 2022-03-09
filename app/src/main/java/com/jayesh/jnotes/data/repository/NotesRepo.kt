@@ -16,6 +16,8 @@ interface NotesRepo {
 
     suspend fun deleteNote(id: String): DbResult
 
+    suspend fun searchNotes(query: String): List<Note>
+
     /** through api **/
     fun syncNote(note: Note)
 

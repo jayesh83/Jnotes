@@ -7,11 +7,12 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.jayesh.jnotes.data.repository.persistance.model.NoteLocalEntity
+import com.jayesh.jnotes.data.repository.persistance.model.NoteLocalEntityFTS
 
 private const val TAG = "NotesDB"
 
 @Database(
-    entities = [NoteLocalEntity::class],
+    entities = [NoteLocalEntity::class, NoteLocalEntityFTS::class],
     version = 1,
     exportSchema = false
 )
