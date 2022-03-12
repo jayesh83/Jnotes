@@ -88,7 +88,8 @@ fun NotesScreen(
             onItemClick = onEditNote,
             scrollToTop = viewmodel.scrollToTop,
             onScrolledToTop = { viewmodel.updateScrollToTop(false) },
-            modifier = Modifier.align(Alignment.TopStart)
+            modifier = Modifier.align(Alignment.TopStart),
+            onSearchQueryChanged = { query -> viewmodel.searchNotes(query) }
         )
         ExtendedFloatingActionButton(
             text = { Text(text = stringResource(R.string.new_note)) },
