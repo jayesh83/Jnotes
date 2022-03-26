@@ -6,14 +6,19 @@ import android.view.Window
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.jayesh.jnotes.gridsystem.rememberGridConfiguration
 import com.jayesh.jnotes.ui.JnotesApp
 import com.jayesh.jnotes.ui.theme.JnotesTheme
+import com.jayesh.jnotes.util.LocalWindowSize
+import com.jayesh.jnotes.util.rememberWindowSizeClass
+import com.sahu.gridconfiguration.LocalGridConfiguration
 import dagger.hilt.android.AndroidEntryPoint
 
 private const val TAG = "MainActivity"
@@ -30,19 +35,23 @@ class MainActivity : ComponentActivity() {
             val systemUiController = rememberSystemUiController()
             val useDarkIcons = MaterialTheme.colors.isLight
 
-            SideEffect {
-                Log.e(TAG, "onCreate: SideEffect called")
-                systemUiController.setSystemBarsColor(
-                    color = Color.Transparent,
-                    isNavigationBarContrastEnforced = false,
-                    darkIcons = useDarkIcons
-                )
-                changeSystemBarsIconsColor(window, useDarkIcons)
-            }
+            CompositionLocalProvider(LocalWindowSize provides rememberWindowSizeClass()) {
+                CompositionLocalProvider(LocalGridConfiguration provides rememberGridConfiguration()) {
+                    SideEffect {
+                        Log.e(TAG, "onCreate: SideEffect called")
+                        systemUiController.setSystemBarsColor(
+                            color = Color.Transparent,
+                            isNavigationBarContrastEnforced = false,
+                            darkIcons = useDarkIcons
+                        )
+                        changeSystemBarsIconsColor(window, useDarkIcons)
+                    }
 
-            JnotesTheme {
-                ProvideWindowInsets {
-                    JnotesApp()
+                    JnotesTheme {
+                        ProvideWindowInsets {
+                            JnotesApp()
+                        }
+                    }
                 }
             }
         }
