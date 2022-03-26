@@ -20,7 +20,4 @@
         <item name="android:windowBackground">@color/grey100</item>
     </style>
 
-    <style name="Theme.Jnotes.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="Theme.Jnotes.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>
