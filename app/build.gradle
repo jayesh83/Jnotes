@@ -51,8 +51,11 @@ android {
 }
 
 dependencies {
+  // grid configuration
+  implementation(project(":GridConfiguration"))
   // room
   implementation "androidx.room:room-runtime:$room_version"
+    implementation 'androidx.window:window:1.0.0'
 
   // To use Kotlin annotation processing tool (kapt)
   kapt("androidx.room:room-compiler:$room_version")

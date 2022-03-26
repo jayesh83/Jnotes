@@ -31,17 +31,19 @@ inline fun LogCompositions(tag: String) {
     }
 }
 
-val blank: String get() = ""
+object StringUtils {
+    val blankString: String get() = ""
 
-/**
- * Returns `this` value if it satisfies the given [predicate] or `null`, if it doesn't.
- *
- * For detailed usage information see the documentation for [scope functions](https://kotlinlang.org/docs/reference/scope-functions.html#takeif-and-takeunless).
- */
-@ExperimentalContracts
-inline fun String.takeStringOrBlank(predicate: (String) -> Boolean): String {
-    contract {
-        callsInPlace(predicate, InvocationKind.EXACTLY_ONCE)
+    /**
+     * Returns `this` value if it satisfies the given [predicate] or `null`, if it doesn't.
+     *
+     * For detailed usage information see the documentation for [scope functions](https://kotlinlang.org/docs/reference/scope-functions.html#takeif-and-takeunless).
+     */
+    @ExperimentalContracts
+    inline fun String.takeStringOrBlank(predicate: (String) -> Boolean): String {
+        contract {
+            callsInPlace(predicate, InvocationKind.EXACTLY_ONCE)
+        }
+        return if (predicate(this)) this else ""
     }
-    return if (predicate(this)) this else ""
 }
