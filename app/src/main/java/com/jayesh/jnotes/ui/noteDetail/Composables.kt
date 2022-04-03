@@ -62,33 +62,42 @@ import com.google.accompanist.insets.navigationBarsPadding
 import com.jayesh.jnotes.R
 import com.jayesh.jnotes.ui.clearFocusOnKeyboardDismiss
 import com.jayesh.jnotes.ui.theme.Orange500
+import com.jayesh.jnotes.util.Constants
 import kotlinx.coroutines.delay
 
 @Composable
 fun BasicTopAppBar(
     modifier: Modifier = Modifier,
+    showNavigationIcon: Boolean = true,
     onBack: () -> Unit,
     backgroundColor: Color,
     contentColor: Color,
     rightSideContentSlot: @Composable () -> Unit
 ) {
     CompositionLocalProvider(LocalContentColor provides contentColor) {
+        val spaceBetweenOrEnd = if (showNavigationIcon) {
+            Arrangement.SpaceBetween
+        } else {
+            Arrangement.End
+        }
         Row(
             modifier = modifier
                 .background(backgroundColor)
                 .padding(start = 11.dp, end = 11.dp, top = 2.dp)
-                .height(56.dp)
+                .height(Constants.topAppBarHeight)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = spaceBetweenOrEnd
         ) {
-            IconButton(onClick = onBack, modifier = Modifier.fillMaxHeight()) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_round_back_24),
-                    contentDescription = null
-                )
+            if (showNavigationIcon) {
+                IconButton(onClick = onBack, modifier = Modifier.fillMaxHeight()) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_round_back_24),
+                        contentDescription = null
+                    )
+                }
+                Spacer(modifier = Modifier.width(8.dp))
             }
-            Spacer(modifier = Modifier.width(8.dp))
             rightSideContentSlot()
         }
     }
@@ -99,12 +108,14 @@ fun TopAppBarWhenEditingNone(
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colors.background,
     contentColor: Color = contentColorFor(backgroundColor = backgroundColor),
+    showNavigationIcon: Boolean = true,
     onBack: () -> Unit,
     onShare: () -> Unit,
     onChangeNoteBackground: () -> Unit
 ) {
     BasicTopAppBar(
         modifier = modifier,
+        showNavigationIcon = showNavigationIcon,
         onBack = onBack,
         backgroundColor = backgroundColor,
         contentColor = contentColor
@@ -132,11 +143,13 @@ fun TopAppBarWhenEditingTitle(
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colors.background,
     contentColor: Color = contentColorFor(backgroundColor = backgroundColor),
+    showNavigationIcon: Boolean = true,
     onBack: () -> Unit,
     onEditingComplete: () -> Unit
 ) {
     BasicTopAppBar(
         modifier = modifier,
+        showNavigationIcon = showNavigationIcon,
         onBack = onBack,
         backgroundColor = backgroundColor,
         contentColor = contentColor
@@ -157,6 +170,7 @@ fun TopAppBarWhenEditingContent(
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colors.background,
     contentColor: Color = contentColorFor(backgroundColor = backgroundColor),
+    showNavigationIcon: Boolean = true,
     onBack: () -> Unit,
     enableUndo: Boolean,
     onUndo: () -> Unit,
@@ -166,6 +180,7 @@ fun TopAppBarWhenEditingContent(
 ) {
     BasicTopAppBar(
         modifier = modifier,
+        showNavigationIcon = showNavigationIcon,
         onBack = onBack,
         backgroundColor = backgroundColor,
         contentColor = contentColor
