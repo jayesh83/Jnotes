@@ -58,6 +58,8 @@ class NoteDetailViewmodelImpl @Inject constructor(
         private set
     var noteBackgroundChangerBottomSheetVisible by mutableStateOf(false)
         private set
+    var forceClearCurrentFocus by mutableStateOf(false)
+        private set
 
     private val diffMatchPatch = DiffMatchPatch()
 
@@ -79,6 +81,7 @@ class NoteDetailViewmodelImpl @Inject constructor(
             viewModelScope.launch {
                 repo.getNote(noteId)?.also { note ->
                     setupNote(note)
+                    resetStateToDefault()
                 }
             }
         } else {
@@ -86,15 +89,23 @@ class NoteDetailViewmodelImpl @Inject constructor(
         }
     }
 
-    private fun setupNote(oldNote: Note) {
-        this.oldNote = oldNote
-        titleTextFieldState = titleTextFieldState.copy(text = oldNote.title)
+    private fun resetStateToDefault() {
+        setCurrentlyEditingState(CurrentlyEditing.None)
+        noteBackgroundChangerBottomSheetVisible = false
+        forceClearCurrentFocus = true
+        stackOfRedo.clear()
+        stackOfUndo.clear()
+    }
+
+    private fun setupNote(note: Note) {
+        this.oldNote = note
+        titleTextFieldState = titleTextFieldState.copy(text = note.title)
         noteTextFieldState = noteTextFieldState.copy(
-            text = oldNote.content.text
+            text = note.content.text
         )
         selectedBackgroundType = BackgroundType.SingleColor(
-            backgroundColor = oldNote.config.backgroundColor,
-            contentColor = oldNote.config.contentColor
+            backgroundColor = note.config.backgroundColor,
+            contentColor = note.config.contentColor
         )
     }
 

@@ -57,6 +57,8 @@ fun NoteDetailScreen(
     showingInMasterDetailUI: Boolean = false
 ) {
     val focusManager = LocalFocusManager.current
+    if (viewmodel.forceClearCurrentFocus)
+        focusManager.clearFocus(true)
 
     fun onBackPress() {
         if (viewmodel.noteBackgroundChangerBottomSheetVisible) {
