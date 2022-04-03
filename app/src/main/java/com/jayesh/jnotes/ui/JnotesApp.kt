@@ -12,7 +12,7 @@ import com.jayesh.jnotes.ui.Screen.NoteCreateNew
 import com.jayesh.jnotes.ui.Screen.NoteEdit
 import com.jayesh.jnotes.ui.Screen.Notes
 import com.jayesh.jnotes.ui.noteDetail.NoteDetailScreen
-import com.jayesh.jnotes.ui.notes.NotesScreen
+import com.jayesh.jnotes.ui.notes.HomeScreen
 
 @Composable
 fun JnotesApp() {
@@ -23,8 +23,9 @@ fun JnotesApp() {
         startDestination = Notes.route
     ) {
         composable(route = Notes.route) {
-            NotesScreen(
-                viewmodel = hiltViewModel(),
+            HomeScreen(
+                notesViewModel = hiltViewModel(),
+                noteDetailViewModel = hiltViewModel(),
                 onAddNewNote = {
                     navController.navigate(NoteCreateNew.route)
                 },
@@ -32,6 +33,16 @@ fun JnotesApp() {
                     navController.navigate(NoteEdit.createRoute(noteId))
                 }
             )
+            // TODO: remove this code
+/*            NotesScreen(
+                viewmodel = hiltViewModel(),
+                onAddNewNote = {
+                    navController.navigate(NoteCreateNew.route)
+                },
+                onEditNote = { noteId ->
+                    navController.navigate(NoteEdit.createRoute(noteId))
+                }
+            )*/
         }
 
         composable(
@@ -40,9 +51,7 @@ fun JnotesApp() {
         ) {
             NoteDetailScreen(
                 viewmodel = hiltViewModel(),
-                onBack = {
-                    navController.navigateUp()
-                }
+                onBack = { navController.navigateUp() }
             )
         }
 
@@ -51,9 +60,7 @@ fun JnotesApp() {
         ) {
             NoteDetailScreen(
                 viewmodel = hiltViewModel(),
-                onBack = {
-                    navController.navigateUp()
-                }
+                onBack = { navController.navigateUp() }
             )
         }
     }

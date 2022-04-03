@@ -69,8 +69,12 @@ class NoteDetailViewmodelImpl @Inject constructor(
 
     init {
         val noteId = savedStateHandle.get<String>("noteId")
-        this.noteId = noteId
+        loadNote(noteId)
+        Log.e(TAG, "Init detail viewmodel")
+    }
 
+    override fun loadNote(noteId: String?) {
+        this.noteId = noteId
         if (noteId != null) {
             viewModelScope.launch {
                 repo.getNote(noteId)?.also { note ->
@@ -258,5 +262,10 @@ class NoteDetailViewmodelImpl @Inject constructor(
 
     enum class Action {
         CREATE, UPDATE, DELETE, NOTHING
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.e(TAG, "onCleared detail viewmodel")
     }
 }

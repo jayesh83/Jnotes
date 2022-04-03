@@ -13,14 +13,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.insets.imePadding
 import com.google.accompanist.insets.navigationBarsPadding
-import com.google.accompanist.insets.navigationBarsWithImePadding
 import com.google.accompanist.insets.statusBarsPadding
 import com.jayesh.jnotes.ui.noteDetail.BackgroundType.SingleColor
 import com.jayesh.jnotes.ui.noteDetail.CurrentlyEditing.None
@@ -45,11 +48,13 @@ private const val TAG = "NewOrEditNote"
 
 // TODO: 04/01/22 scroll title along with note
 // FIXME: 04/01/22 textfield text below keyboard
+// FIXME: entire screen is being recomposed on each text typing
 
 @Composable
 fun NoteDetailScreen(
     viewmodel: NoteDetailViewmodelImpl,
-    onBack: () -> Unit
+    onBack: (() -> Unit)? = null,
+    showingInMasterDetailUI: Boolean = false
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -59,7 +64,7 @@ fun NoteDetailScreen(
         } else {
             focusManager.clearFocus(true)
             viewmodel.updateNoteIfNeeded()
-            onBack()
+            onBack?.invoke()
         }
     }
 
@@ -68,21 +73,29 @@ fun NoteDetailScreen(
         onBackPress()
     }
 
+    val horizontalSpacing = remember { if (showingInMasterDetailUI) 16.dp else 28.dp }
+    val showNavigationIcon by derivedStateOf { showingInMasterDetailUI.not() }
+
     JnotesTheme(
         backgroundColor = viewmodel.selectedBackgroundType.backgroundColor,
         contentColor = viewmodel.selectedBackgroundType.contentColor
     ) {
-        Box(
-            modifier = Modifier
-                .background(MaterialTheme.colors.background)
-                .fillMaxSize()
-                .statusBarsPadding()
-                .navigationBarsPadding(
+        var containerModifier = Modifier
+            .background(MaterialTheme.colors.background)
+            .fillMaxSize()
+            .statusBarsPadding()
+
+        if (showingInMasterDetailUI.not()) {
+            containerModifier = containerModifier.then(
+                Modifier.navigationBarsPadding(
                     start = true,
                     end = true,
                     bottom = false
-                )  // when in landscape mode, apply end edge navigation bar padding) {
-        ) {
+                )
+            )
+        }
+
+        Box(modifier = containerModifier) {
             Column {
                 Crossfade(
                     targetState = viewmodel.currentlyEditing,
@@ -91,6 +104,7 @@ fun NoteDetailScreen(
                     when (currentlyEditing) {
                         Title -> {
                             TopAppBarWhenEditingTitle(
+                                showNavigationIcon = showNavigationIcon,
                                 onBack = { onBackPress() },
                                 onEditingComplete = {
                                     setEditingComplete(viewmodel, focusManager)
@@ -99,6 +113,7 @@ fun NoteDetailScreen(
                         }
                         Note -> {
                             TopAppBarWhenEditingContent(
+                                showNavigationIcon = showNavigationIcon,
                                 onBack = { onBackPress() },
                                 enableUndo = viewmodel.enableUndo,
                                 onUndo = viewmodel::undo,
@@ -111,6 +126,7 @@ fun NoteDetailScreen(
                         }
                         None -> {
                             TopAppBarWhenEditingNone(
+                                showNavigationIcon = showNavigationIcon,
                                 onBack = { onBackPress() },
                                 onShare = {},
                                 onChangeNoteBackground = viewmodel::toggleNoteBackgroundChangerState
@@ -128,7 +144,11 @@ fun NoteDetailScreen(
                         }
                     },
                     modifier = Modifier
-                        .padding(start = 28.dp, end = 28.dp, bottom = 16.dp)
+                        .padding(
+                            start = horizontalSpacing,
+                            end = horizontalSpacing,
+                            bottom = 16.dp
+                        )
                         .fillMaxWidth()
                 )
                 NoteTextField(
@@ -145,9 +165,13 @@ fun NoteDetailScreen(
                         viewmodel.setCurrentlyEditingState(None)
                     },
                     modifier = Modifier
-                        .padding(start = 28.dp, top = 8.dp, end = 28.dp)
+                        .padding(
+                            start = horizontalSpacing,
+                            end = horizontalSpacing,
+                            top = 8.dp
+                        )
                         .fillMaxSize()
-                        .navigationBarsWithImePadding()
+                        .imePadding()
                 )
             }
             AnimatedVisibility(
