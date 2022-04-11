@@ -84,6 +84,7 @@ fun HomeScreen(
                         scrollToTop = notesViewModel.scrollToTop,
                         onScrolledToTop = { notesViewModel.updateScrollToTop(false) },
                         modifier = Modifier.align(Alignment.TopStart),
+                        searchQuery = notesViewModel.searchQueryText.value,
                         onSearchQueryChanged = { query -> notesViewModel.searchNotes(query) }
                     )
                     AddNewNoteFloatingActionButton(
@@ -183,6 +184,7 @@ fun NotesScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .align(Alignment.TopStart),
+            searchQuery = viewmodel.searchQueryText.value,
             onSearchQueryChanged = { query -> viewmodel.searchNotes(query) }
         )
         AddNewNoteFloatingActionButton(

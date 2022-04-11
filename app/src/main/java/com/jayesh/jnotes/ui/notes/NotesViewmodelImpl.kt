@@ -1,6 +1,7 @@
 package com.jayesh.jnotes.ui.notes
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.jayesh.jnotes.data.repository.NotesRepo
@@ -23,7 +24,7 @@ class NotesViewmodelImpl @Inject constructor(
 ) : NotesViewmodel() {
     private val _notes: MutableStateFlow<List<Note>> = MutableStateFlow(emptyList())
     val notes = _notes.asStateFlow()
-
+    val searchQueryText = mutableStateOf("")
     var scrollToTop: Boolean = false
         private set
 
@@ -48,8 +49,10 @@ class NotesViewmodelImpl @Inject constructor(
     }
 
     override fun searchNotes(query: String) {
+        searchQueryText.value = query.ifBlank { "" }
+
         viewModelScope.launch {
-            val matchedNotes = if (query.length > 1) {
+            val matchedNotes = if (searchQueryText.value.length > 1) {
                 repo.searchNotes(sanitizeSearchQuery(query))
             } else {
                 repo.getAllNotes().firstOrNull() ?: emptyList()
