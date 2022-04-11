@@ -54,7 +54,8 @@ private const val TAG = "NewOrEditNote"
 fun NoteDetailScreen(
     viewmodel: NoteDetailViewmodelImpl,
     onBack: (() -> Unit)? = null,
-    showingInMasterDetailUI: Boolean = false
+    showingInMasterDetailUI: Boolean = false,
+    onEditRequest: () -> Unit = { }
 ) {
     val focusManager = LocalFocusManager.current
     if (viewmodel.forceClearCurrentFocus)
@@ -70,13 +71,16 @@ fun NoteDetailScreen(
         }
     }
 
-    BackHandler {
+    BackHandler(enabled = showingInMasterDetailUI.not()) {
         Log.e(TAG, "NewOrEditNoteScreen: BackHandler called")
         onBackPress()
     }
 
-    val horizontalSpacing = remember { if (showingInMasterDetailUI) 16.dp else 28.dp }
+    val horizontalStartSpacing = remember { if (showingInMasterDetailUI) 20.dp else 28.dp }
+    val horizontalEndSpacing = remember { if (showingInMasterDetailUI) 14.dp else 28.dp }
+
     val showNavigationIcon by derivedStateOf { showingInMasterDetailUI.not() }
+    val textFieldEditable by derivedStateOf { showingInMasterDetailUI.not() }
 
     JnotesTheme(
         backgroundColor = viewmodel.selectedBackgroundType.backgroundColor,
@@ -147,11 +151,13 @@ fun NoteDetailScreen(
                     },
                     modifier = Modifier
                         .padding(
-                            start = horizontalSpacing,
-                            end = horizontalSpacing,
+                            start = horizontalStartSpacing,
+                            end = horizontalEndSpacing,
                             bottom = 16.dp
                         )
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    clickable = textFieldEditable,
+                    onClick = onEditRequest
                 )
                 NoteTextField(
                     textFieldValue = viewmodel.noteTextFieldState,
@@ -168,12 +174,14 @@ fun NoteDetailScreen(
                     },
                     modifier = Modifier
                         .padding(
-                            start = horizontalSpacing,
-                            end = horizontalSpacing,
+                            start = horizontalStartSpacing,
+                            end = horizontalEndSpacing,
                             top = 8.dp
                         )
                         .fillMaxSize()
-                        .imePadding()
+                        .imePadding(),
+                    clickable = textFieldEditable,
+                    onClick = onEditRequest
                 )
             }
             AnimatedVisibility(

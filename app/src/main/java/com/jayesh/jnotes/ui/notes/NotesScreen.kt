@@ -110,7 +110,10 @@ fun HomeScreen(
                             noteDetailViewModel.loadNote(noteId.value)
                             NoteDetailScreen(
                                 viewmodel = noteDetailViewModel,
-                                showingInMasterDetailUI = true
+                                showingInMasterDetailUI = true,
+                                onEditRequest = {
+                                    onEditNote(noteId.value)
+                                }
                             )
                         }
                     }
@@ -177,7 +180,9 @@ fun NotesScreen(
             onItemClick = onEditNote,
             scrollToTop = viewmodel.scrollToTop,
             onScrolledToTop = { viewmodel.updateScrollToTop(false) },
-            modifier = Modifier.align(Alignment.TopStart),
+            modifier = Modifier
+                .fillMaxSize()
+                .align(Alignment.TopStart),
             onSearchQueryChanged = { query -> viewmodel.searchNotes(query) }
         )
         AddNewNoteFloatingActionButton(
