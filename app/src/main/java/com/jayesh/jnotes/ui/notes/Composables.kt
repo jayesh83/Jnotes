@@ -7,8 +7,10 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -68,6 +70,7 @@ import com.jayesh.jnotes.ui.models.Note
 import com.jayesh.jnotes.ui.theme.JnotesTheme
 import com.jayesh.jnotes.util.timeAgo
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NoteList(
     notes: List<Note>,
@@ -92,40 +95,42 @@ fun NoteList(
         }
     }
 
-    LazyColumn(
-        state = listState,
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        contentPadding = contentPadding
-    ) {
-        item {
-            Text(
-                text = stringResource(id = R.string.app_name),
-                style = MaterialTheme.typography.h4.copy(color = MaterialTheme.colors.onSurface),
-                modifier = Modifier.padding(horizontal = 18.dp, vertical = 32.dp)
-            )
-        }
-        item {
-            SearchComponent(
-                modifier = Modifier.padding(start = 14.dp, end = 14.dp, bottom = 14.dp),
-                text = searchQuery,
-                onTextChange = onSearchQueryChanged,
-                onClearClick = { onSearchQueryChanged("") }
-            )
-        }
-        itemsIndexed(
-            items = notes,
-            key = { _, note -> note.id },
-            itemContent = { _, note ->
-                NoteItem(note = note, onItemClick = onItemClick)
-            }
-        )
-        item {
-            Spacer(
-                modifier = Modifier.height(
-                    (LocalConfiguration.current.screenHeightDp / 6).dp
+    CompositionLocalProvider(LocalOverScrollConfiguration provides null) {
+        LazyColumn(
+            state = listState,
+            modifier = modifier,
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = contentPadding
+        ) {
+            item {
+                Text(
+                    text = stringResource(id = R.string.app_name),
+                    style = MaterialTheme.typography.h4.copy(color = MaterialTheme.colors.onSurface),
+                    modifier = Modifier.padding(horizontal = 18.dp, vertical = 32.dp)
                 )
+            }
+            item {
+                SearchComponent(
+                    modifier = Modifier.padding(start = 14.dp, end = 14.dp, bottom = 14.dp),
+                    text = searchQuery,
+                    onTextChange = onSearchQueryChanged,
+                    onClearClick = { onSearchQueryChanged("") }
+                )
+            }
+            itemsIndexed(
+                items = notes,
+                key = { _, note -> note.id },
+                itemContent = { _, note ->
+                    NoteItem(note = note, onItemClick = onItemClick)
+                }
             )
+            item {
+                Spacer(
+                    modifier = Modifier.height(
+                        (LocalConfiguration.current.screenHeightDp / 6).dp
+                    )
+                )
+            }
         }
     }
 }
