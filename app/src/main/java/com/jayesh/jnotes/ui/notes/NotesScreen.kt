@@ -21,6 +21,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -108,7 +109,9 @@ fun HomeScreen(
                                 )
                             }
                         } else {
-                            noteDetailViewModel.loadNote(noteId.value)
+                            LaunchedEffect(key1 = noteId.value) {
+                                noteDetailViewModel.loadNote(noteId.value)
+                            }
                             NoteDetailScreen(
                                 viewmodel = noteDetailViewModel,
                                 showingInMasterDetailUI = true,
