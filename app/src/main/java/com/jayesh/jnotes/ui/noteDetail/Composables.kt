@@ -215,8 +215,7 @@ fun TitleTextField(
     isFocused: Boolean,
     onFocusChanged: (FocusState) -> Unit,
     modifier: Modifier = Modifier,
-    clickable: Boolean = true,
-    onClick: () -> Unit = {},
+    enabled: Boolean = true,
     backgroundColor: Color = MaterialTheme.colors.background,
     contentColor: Color = contentColorFor(backgroundColor = backgroundColor),
 ) {
@@ -242,18 +241,11 @@ fun TitleTextField(
         BasicTextField(
             value = textFieldValue,
             onValueChange = onTitleChange,
-            enabled = clickable,
+            enabled = enabled,
             modifier = modifier
                 .background(backgroundColor)
                 .focusRequester(focusRequester)
-                .onFocusChanged { currentFocusChanged(it) }
-                .clickable(
-                    onClick = onClick,
-                    interactionSource = remember {
-                        MutableInteractionSource()
-                    },
-                    indication = null
-                ),
+                .onFocusChanged { currentFocusChanged(it) },
             textStyle = commonTextStyle,
             cursorBrush = SolidColor(contentColor),
             keyboardOptions = KeyboardOptions(
@@ -281,8 +273,7 @@ fun NoteTextField(
     isFocused: Boolean,
     onFocusChanged: (FocusState) -> Unit,
     modifier: Modifier = Modifier,
-    clickable: Boolean = true,
-    onClick: () -> Unit = {},
+    editable: Boolean = true,
     backgroundColor: Color = MaterialTheme.colors.background,
     contentColor: Color = contentColorFor(backgroundColor = backgroundColor),
     shouldPadToNavigationBars: Boolean = false,
@@ -316,7 +307,7 @@ fun NoteTextField(
         BasicTextField(
             value = textFieldValue,
             onValueChange = onNoteChange,
-            enabled = clickable,
+            enabled = editable,
             modifier = modifier
                 .navigationBarsPadding(
                     bottom = currentShouldPadToNavigationBars,
@@ -326,14 +317,7 @@ fun NoteTextField(
                 .background(backgroundColor)
                 .focusRequester(focusRequester)
                 .onFocusChanged { currentFocusChanged(it) }
-                .clearFocusOnKeyboardDismiss(onSoftKeyboardDismissed)
-                .clickable(
-                    onClick = onClick,
-                    interactionSource = remember {
-                        MutableInteractionSource()
-                    },
-                    indication = null
-                ),
+                .clearFocusOnKeyboardDismiss(onSoftKeyboardDismissed),
             textStyle = commonTextStyle,
             cursorBrush = SolidColor(contentColor),
             keyboardOptions = KeyboardOptions(

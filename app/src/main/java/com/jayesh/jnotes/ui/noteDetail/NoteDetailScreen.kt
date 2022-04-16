@@ -6,6 +6,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -102,7 +104,13 @@ fun NoteDetailScreen(
         }
 
         Box(modifier = containerModifier) {
-            Column {
+            Column(
+                modifier = Modifier.clickable(
+                    onClick = onEditRequest,
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                )
+            ) {
                 Crossfade(
                     targetState = viewmodel.currentlyEditing,
                     animationSpec = spring()
@@ -156,8 +164,7 @@ fun NoteDetailScreen(
                             bottom = 16.dp
                         )
                         .fillMaxWidth(),
-                    clickable = textFieldEditable,
-                    onClick = onEditRequest
+                    enabled = textFieldEditable,
                 )
                 NoteTextField(
                     textFieldValue = viewmodel.noteTextFieldState,
@@ -180,8 +187,7 @@ fun NoteDetailScreen(
                         )
                         .fillMaxSize()
                         .imePadding(),
-                    clickable = textFieldEditable,
-                    onClick = onEditRequest
+                    editable = textFieldEditable,
                 )
             }
             AnimatedVisibility(
