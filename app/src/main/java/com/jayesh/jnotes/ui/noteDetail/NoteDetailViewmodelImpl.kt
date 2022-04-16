@@ -183,6 +183,7 @@ class NoteDetailViewmodelImpl @Inject constructor(
     fun setOnBackgroundChange(background: BackgroundType) {
         if (background is BackgroundType.SingleColor) {
             selectedBackgroundType = background
+            noteId?.let { updateNote(it, getUpdatedNote()) }
         }
     }
 
