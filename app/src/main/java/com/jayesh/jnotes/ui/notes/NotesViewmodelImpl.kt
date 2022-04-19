@@ -2,12 +2,12 @@ package com.jayesh.jnotes.ui.notes
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.jayesh.jnotes.data.repository.NotesRepo
 import com.jayesh.jnotes.data.repository.persistance.DbResult
 import com.jayesh.jnotes.ui.models.Note
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
@@ -19,12 +19,14 @@ private const val TAG = "NotesListingViewmodel"
 
 @HiltViewModel
 class NotesViewmodelImpl @Inject constructor(
-    savedStateHandle: SavedStateHandle,
     private val repo: NotesRepo
 ) : NotesViewmodel() {
     private val _notes: MutableStateFlow<List<Note>> = MutableStateFlow(emptyList())
     val notes = _notes.asStateFlow()
+
+    var searchNotesJob: Job? = null
     val searchQueryText = mutableStateOf("")
+
     var scrollToTop: Boolean = false
         private set
 
@@ -32,9 +34,9 @@ class NotesViewmodelImpl @Inject constructor(
         Log.e(TAG, "init NotesListingViewmodel")
         viewModelScope.launch {
             repo.getAllNotes()
-                .collect {
+                .collect { notes ->
                     scrollToTop = true  // when there's a new list, scroll list to top
-                    _notes.value = it
+                    _notes.value = notes
                     Log.e(TAG, "collecting list")
                 }
         }
@@ -49,10 +51,11 @@ class NotesViewmodelImpl @Inject constructor(
     }
 
     override fun searchNotes(query: String) {
+        searchNotesJob?.cancel()
         searchQueryText.value = query.ifBlank { "" }
 
-        viewModelScope.launch {
-            val matchedNotes = if (searchQueryText.value.length > 1) {
+        searchNotesJob = viewModelScope.launch {
+            val matchedNotes = if (searchQueryText.value.isNotEmpty()) {
                 repo.searchNotes(sanitizeSearchQuery(query))
             } else {
                 repo.getAllNotes().firstOrNull() ?: emptyList()

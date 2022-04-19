@@ -86,6 +86,10 @@ fun NoteList(
     val currentOnScrolledToTop by rememberUpdatedState(newValue = onScrolledToTop)
     val currentScrolledToTop by rememberUpdatedState(newValue = scrollToTop)
 
+    LaunchedEffect(key1 = Unit) {
+        if (searchQuery.isNotEmpty()) onSearchQueryChanged(searchQuery)
+    }
+
     LaunchedEffect(key1 = currentScrolledToTop) {
         if (currentScrolledToTop) {
             Log.e("NoteList", "scrolling to top")

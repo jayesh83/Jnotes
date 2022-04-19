@@ -43,16 +43,19 @@ class NotesDbSourceImpl @Inject constructor(
     }
 
     override suspend fun editNote(id: String, note: Note): DbResult {
+        Log.e(TAG, "editNote() called called with: id= $id")
         notesDao.updateNote(mapper.mapFromDomain(note))
         return DbResult.Success
     }
 
     override suspend fun deleteNote(id: String): DbResult {
+        Log.e(TAG, "deleteNote() called called with: id= $id")
         notesDao.deleteNote(id)
         return DbResult.Success
     }
 
     override suspend fun searchNotes(query: String): List<Note> {
+        Log.e(TAG, "searchNotes() called called with: query= $query")
         val noteEntitiesMatchInfo: List<NoteLocalEntityMatchInfo> = notesDao.searchNotes(query)
         return noteEntitiesMatchInfo.sortedByDescending {
             OkapiBM25.score(it.matchInfo, column = 0)
