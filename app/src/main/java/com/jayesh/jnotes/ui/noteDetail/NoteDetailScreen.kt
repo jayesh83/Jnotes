@@ -196,7 +196,12 @@ fun NoteDetailScreen(
             ) {
                 BottomSheetNoteBackgroundChanger(
                     selectedBackground = viewmodel.selectedBackgroundType,
-                    onBackgroundSelected = viewmodel::setOnBackgroundChange,
+                    onBackgroundSelected = { backgroundType ->
+                        viewmodel.setOnBackgroundChange(
+                            background = backgroundType,
+                            shouldUpdateInDb = showingInMasterDetailUI
+                        )
+                    },
                     backgroundList = viewmodel.availableSingleColorBackgrounds()
                 )
             }

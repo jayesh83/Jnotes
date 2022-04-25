@@ -180,10 +180,12 @@ class NoteDetailViewmodelImpl @Inject constructor(
         }
     }
 
-    fun setOnBackgroundChange(background: BackgroundType) {
+    fun setOnBackgroundChange(background: BackgroundType, shouldUpdateInDb: Boolean = false) {
         if (background is BackgroundType.SingleColor) {
             selectedBackgroundType = background
-            noteId?.let { updateNote(it, getUpdatedNote()) }
+            if (shouldUpdateInDb) {
+                noteId?.let { updateNote(it, getUpdatedNote()) }
+            }
         }
     }
 
