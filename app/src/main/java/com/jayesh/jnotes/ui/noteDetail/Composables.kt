@@ -403,7 +403,9 @@ fun ChangeBackgroundItem(
             indication = null,
             interactionSource = remember { MutableInteractionSource() }
         ) {
-            onBackgroundSelected(itemData.backgroundType)
+            if (!itemData.isSelected) {
+                onBackgroundSelected(itemData.backgroundType)
+            }
         }
 
     if (itemData.isSelected) {
