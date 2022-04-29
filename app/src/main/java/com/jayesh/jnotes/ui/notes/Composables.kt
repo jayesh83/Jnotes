@@ -1,7 +1,6 @@
 package com.jayesh.jnotes.ui.notes
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -69,6 +68,7 @@ import com.jayesh.jnotes.ui.clearFocusOnKeyboardDismiss
 import com.jayesh.jnotes.ui.models.Note
 import com.jayesh.jnotes.ui.theme.JnotesTheme
 import com.jayesh.jnotes.util.timeAgo
+import timber.log.Timber
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -87,13 +87,13 @@ fun NoteList(
     val currentScrolledToTop by rememberUpdatedState(newValue = scrollToTop)
 
     LaunchedEffect(key1 = notes) {
-        Log.e("CheckingSearch", "query")
+        Timber.e("CheckingSearch query")
         if (searchQuery.isNotEmpty()) onSearchQueryChanged(searchQuery)
     }
 
     LaunchedEffect(key1 = currentScrolledToTop) {
         if (currentScrolledToTop) {
-            Log.e("NoteList", "scrolling to top")
+            Timber.e("NoteList scrolling to top")
             listState.scrollToItem(0)
             currentOnScrolledToTop.invoke()
         }

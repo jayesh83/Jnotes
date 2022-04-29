@@ -1,6 +1,5 @@
 package com.jayesh.jnotes.ui.notes
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -15,6 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 private const val TAG = "NotesListingViewmodel"
@@ -33,13 +33,13 @@ class NotesViewmodelImpl @Inject constructor(
         private set
 
     init {
-        Log.e(TAG, "init NotesListingViewmodel")
+        Timber.e("init NotesListingViewmodel")
         viewModelScope.launch {
             repo.getAllNotes()
                 .collect { notes ->
                     _notes.value = notes
                     scrollToTop = true  // when there's a new list, scroll list to top
-                    Log.e(TAG, "collecting list")
+                    Timber.e("collecting list")
                 }
         }
     }
@@ -75,6 +75,6 @@ class NotesViewmodelImpl @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        Log.e(TAG, "onCleared NotesListingViewmodel")
+        Timber.e("onCleared NotesListingViewmodel")
     }
 }

@@ -1,11 +1,11 @@
 package com.jayesh.jnotes.util
 
 import android.text.format.DateUtils
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import com.jayesh.jnotes.BuildConfig
+import timber.log.Timber
 import java.util.Calendar
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -27,7 +27,7 @@ inline fun LogCompositions(tag: String) {
     if (EnableDebugCompositionLogs && BuildConfig.DEBUG) {
         val ref = remember { Ref(0) }
         SideEffect { ref.value++ }
-        Log.e(tag, "Compositions: ${ref.value}")
+        Timber.e("Compositions: ${ref.value}")
     }
 }
 

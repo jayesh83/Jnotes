@@ -1,7 +1,6 @@
 package com.jayesh.jnotes
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Window
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,6 +19,7 @@ import com.jayesh.jnotes.util.LocalWindowSize
 import com.jayesh.jnotes.util.rememberWindowSizeClass
 import com.sahu.gridconfiguration.LocalGridConfiguration
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 private const val TAG = "MainActivity"
 
@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
             CompositionLocalProvider(LocalWindowSize provides rememberWindowSizeClass()) {
                 CompositionLocalProvider(LocalGridConfiguration provides rememberGridConfiguration()) {
                     SideEffect {
-                        Log.e(TAG, "onCreate: SideEffect called")
+                        Timber.e("onCreate: SideEffect called")
                         systemUiController.setSystemBarsColor(
                             color = Color.Transparent,
                             isNavigationBarContrastEnforced = false,

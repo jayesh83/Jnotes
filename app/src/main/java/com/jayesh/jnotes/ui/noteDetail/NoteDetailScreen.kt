@@ -1,6 +1,5 @@
 package com.jayesh.jnotes.ui.noteDetail
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
@@ -45,6 +44,7 @@ import com.jayesh.jnotes.ui.theme.Parrot500
 import com.jayesh.jnotes.ui.theme.Pink200
 import com.jayesh.jnotes.ui.theme.Pink500
 import com.jayesh.jnotes.ui.theme.WhiteMutated
+import timber.log.Timber
 
 private const val TAG = "NewOrEditNote"
 
@@ -74,7 +74,7 @@ fun NoteDetailScreen(
     }
 
     BackHandler(enabled = showingInMasterDetailUI.not()) {
-        Log.e(TAG, "NewOrEditNoteScreen: BackHandler called")
+        Timber.e("NewOrEditNoteScreen: BackHandler called")
         onBackPress()
     }
 

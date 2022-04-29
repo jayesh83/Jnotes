@@ -1,13 +1,13 @@
 package com.jayesh.jnotes.data.repository.persistance
 
 import android.content.Context
-import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.jayesh.jnotes.data.repository.persistance.model.NoteLocalEntity
 import com.jayesh.jnotes.data.repository.persistance.model.NoteLocalEntityFTS
+import timber.log.Timber
 
 private const val TAG = "NotesDB"
 
@@ -36,7 +36,7 @@ abstract class NotesDB : RoomDatabase() {
                     object : RoomDatabase.Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
-                            Log.e(TAG, "creating notes database")
+                            Timber.e("creating notes database")
                         }
                     }
                 ).build()

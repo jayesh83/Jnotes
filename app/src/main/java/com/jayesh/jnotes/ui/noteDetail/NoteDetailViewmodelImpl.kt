@@ -1,6 +1,5 @@
 package com.jayesh.jnotes.ui.noteDetail
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +30,7 @@ import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Operation.DELETE
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Operation.EQUAL
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Operation.INSERT
+import timber.log.Timber
 import java.util.LinkedList
 import java.util.UUID
 import javax.inject.Inject
@@ -72,7 +72,7 @@ class NoteDetailViewmodelImpl @Inject constructor(
     init {
         val noteId = savedStateHandle.get<String>("noteId")
         loadNote(noteId)
-        Log.e(TAG, "Init detail viewmodel")
+        Timber.e("Init detail viewmodel")
     }
 
     override fun loadNote(noteId: String?) {
@@ -210,7 +210,7 @@ class NoteDetailViewmodelImpl @Inject constructor(
             if (decision == Action.DELETE)
                 noteId?.let { noteId -> deleteNote(noteId) }
         }
-        Log.e(TAG, "updateNoteIfNeeded: decision: ${decision.name}")
+        Timber.e("updateNoteIfNeeded: decision: ${decision.name}")
     }
 
     private val contentEmpty
@@ -280,6 +280,6 @@ class NoteDetailViewmodelImpl @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        Log.e(TAG, "onCleared detail viewmodel")
+        Timber.e("onCleared detail viewmodel")
     }
 }

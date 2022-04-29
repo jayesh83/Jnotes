@@ -51,6 +51,9 @@ android {
 }
 
 dependencies {
+  // timber logging
+  implementation 'com.jakewharton.timber:timber:5.0.1'
+
   // grid configuration
   implementation(project(":GridConfiguration"))
   // room
