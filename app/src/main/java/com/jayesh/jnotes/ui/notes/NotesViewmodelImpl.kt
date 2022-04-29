@@ -1,7 +1,9 @@
 package com.jayesh.jnotes.ui.notes
 
 import android.util.Log
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.jayesh.jnotes.data.repository.NotesRepo
 import com.jayesh.jnotes.data.repository.persistance.DbResult
@@ -27,7 +29,7 @@ class NotesViewmodelImpl @Inject constructor(
     var searchNotesJob: Job? = null
     val searchQueryText = mutableStateOf("")
 
-    var scrollToTop: Boolean = false
+    var scrollToTop: Boolean by mutableStateOf(false)
         private set
 
     init {
@@ -35,8 +37,8 @@ class NotesViewmodelImpl @Inject constructor(
         viewModelScope.launch {
             repo.getAllNotes()
                 .collect { notes ->
-                    scrollToTop = true  // when there's a new list, scroll list to top
                     _notes.value = notes
+                    scrollToTop = true  // when there's a new list, scroll list to top
                     Log.e(TAG, "collecting list")
                 }
         }
