@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExtendedFloatingActionButton
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -34,9 +35,11 @@ import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavController
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
 import com.jayesh.jnotes.R
+import com.jayesh.jnotes.ui.Screen.NoteEditGraph
 import com.jayesh.jnotes.ui.noteDetail.NoteDetailScreen
 import com.jayesh.jnotes.ui.noteDetail.NoteDetailViewmodelImpl
 import com.jayesh.jnotes.util.Constants
@@ -49,20 +52,29 @@ import com.sahu.panes.TwoPane
 
 @Composable
 fun HomeScreen(
+    navController: NavController,
     notesViewModel: NotesViewmodelImpl,
-    noteDetailViewModel: NoteDetailViewmodelImpl,
-    onAddNewNote: () -> Unit,
-    onEditNote: (noteId: String) -> Unit
+    noteDetailViewModel: NoteDetailViewmodelImpl
 ) {
     val windowSizeClass = LocalWindowSize.current
     val listState = rememberLazyListState()
+
+    fun navigateToNoteEdit(noteId: String) {
+        navController.navigate(NoteEditGraph.createRoute(noteId)) {
+            launchSingleTop = true
+        }
+    }
+
+    fun navigateToCreateNewNote() {
+        navController.navigate(NoteEditGraph.createRoute(noteId = null))
+    }
 
     when (windowSizeClass) {
         WindowSize.Compact, WindowSize.Medium -> {
             NotesScreen(
                 viewmodel = notesViewModel,
-                onAddNewNote = onAddNewNote,
-                onEditNote = onEditNote,
+                onAddNewNote = ::navigateToCreateNewNote,
+                onEditNote = ::navigateToNoteEdit,
                 notesListState = listState
             )
         }
@@ -93,7 +105,7 @@ fun HomeScreen(
                             .align(Alignment.BottomEnd)
                             .padding(16.dp)
                             .navigationBarsPadding(start = false, end = false),
-                        onClick = onAddNewNote,
+                        onClick = ::navigateToCreateNewNote,
                         windowSizeClass = windowSizeClass
                     )
                 },
@@ -103,9 +115,8 @@ fun HomeScreen(
                             Box(modifier = Modifier.fillMaxSize()) {
                                 Text(
                                     text = "Select a note to view details",
-                                    modifier = Modifier.align(
-                                        Alignment.Center
-                                    )
+                                    modifier = Modifier.align(Alignment.Center),
+                                    style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.onSurface)
                                 )
                             }
                         } else {
@@ -113,11 +124,9 @@ fun HomeScreen(
                                 noteDetailViewModel.loadNote(noteId.value)
                             }
                             NoteDetailScreen(
+                                navController = navController,
                                 viewmodel = noteDetailViewModel,
-                                showingInMasterDetailUI = true,
-                                onEditRequest = {
-                                    onEditNote(noteId.value)
-                                }
+                                showingInMasterDetailUI = true
                             )
                         }
                     }

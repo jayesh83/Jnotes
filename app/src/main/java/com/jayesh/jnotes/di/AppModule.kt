@@ -2,6 +2,8 @@ package com.jayesh.jnotes.di
 
 import com.jayesh.jnotes.data.repository.NotesRepo
 import com.jayesh.jnotes.data.repository.NotesRepoImpl
+import com.jayesh.jnotes.data.repository.fileUtility.FileHelper
+import com.jayesh.jnotes.data.repository.fileUtility.FileHelperImpl
 import com.jayesh.jnotes.data.repository.persistance.NotesDbSource
 import com.jayesh.jnotes.data.repository.persistance.NotesDbSourceImpl
 import dagger.Binds
@@ -24,4 +26,10 @@ interface AppModule {
     fun provideNotesRepository(
         notesRepoImpl: NotesRepoImpl
     ): NotesRepo
+
+    @Singleton
+    @Binds
+    fun provideFileHelper(
+        fileHelperImpl: FileHelperImpl
+    ): FileHelper
 }

@@ -87,7 +87,6 @@ fun NoteList(
     val currentScrolledToTop by rememberUpdatedState(newValue = scrollToTop)
 
     LaunchedEffect(key1 = notes) {
-        Timber.e("CheckingSearch query")
         if (searchQuery.isNotEmpty()) onSearchQueryChanged(searchQuery)
     }
 

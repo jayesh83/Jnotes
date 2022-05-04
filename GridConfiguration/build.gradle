@@ -25,7 +25,6 @@ android {
   }
   composeOptions {
     kotlinCompilerExtensionVersion compose_version
-    kotlinCompilerVersion '1.6.10'
   }
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_1_8

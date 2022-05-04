@@ -23,9 +23,11 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.google.accompanist.insets.imePadding
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
+import com.jayesh.jnotes.ui.Screen
 import com.jayesh.jnotes.ui.noteDetail.BackgroundType.SingleColor
 import com.jayesh.jnotes.ui.noteDetail.CurrentlyEditing.None
 import com.jayesh.jnotes.ui.noteDetail.CurrentlyEditing.Note
@@ -46,6 +48,7 @@ import com.jayesh.jnotes.ui.theme.Pink500
 import com.jayesh.jnotes.ui.theme.WhiteMutated
 import timber.log.Timber
 
+
 private const val TAG = "NewOrEditNote"
 
 // TODO: 04/01/22 scroll title along with note
@@ -54,11 +57,22 @@ private const val TAG = "NewOrEditNote"
 
 @Composable
 fun NoteDetailScreen(
+    navController: NavController,
     viewmodel: NoteDetailViewmodelImpl,
-    onBack: (() -> Unit)? = null,
-    showingInMasterDetailUI: Boolean = false,
-    onEditRequest: () -> Unit = { }
+    showingInMasterDetailUI: Boolean = false
 ) {
+    fun goBack() = navController.navigateUp()
+
+    fun navigateToNoteShare() {
+        navController.navigate(Screen.NoteShare.route)
+    }
+
+    fun navigateToFullScreenNoteDetail(noteId: String = viewmodel.getNoteId()) {
+        navController.navigate(Screen.NoteEditGraph.createRoute(noteId)) {
+            launchSingleTop = true
+        }
+    }
+
     val focusManager = LocalFocusManager.current
     if (viewmodel.forceClearCurrentFocus)
         focusManager.clearFocus(true)
@@ -69,7 +83,7 @@ fun NoteDetailScreen(
         } else {
             focusManager.clearFocus(true)
             viewmodel.updateNoteIfNeeded()
-            onBack?.invoke()
+            goBack()
         }
     }
 
@@ -101,16 +115,18 @@ fun NoteDetailScreen(
                     bottom = false
                 )
             )
-        }
-
-        Box(modifier = containerModifier) {
-            Column(
-                modifier = Modifier.clickable(
-                    onClick = onEditRequest,
+        } else {
+            containerModifier = containerModifier.then(
+                Modifier.clickable(
+                    onClick = ::navigateToFullScreenNoteDetail,
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
                 )
-            ) {
+            )
+        }
+
+        Box(modifier = containerModifier) {
+            Column {
                 Crossfade(
                     targetState = viewmodel.currentlyEditing,
                     animationSpec = spring()
@@ -119,7 +135,7 @@ fun NoteDetailScreen(
                         Title -> {
                             TopAppBarWhenEditingTitle(
                                 showNavigationIcon = showNavigationIcon,
-                                onBack = { onBackPress() },
+                                onBack = ::onBackPress,
                                 onEditingComplete = {
                                     setEditingComplete(viewmodel, focusManager)
                                 }
@@ -128,7 +144,7 @@ fun NoteDetailScreen(
                         Note -> {
                             TopAppBarWhenEditingContent(
                                 showNavigationIcon = showNavigationIcon,
-                                onBack = { onBackPress() },
+                                onBack = ::onBackPress,
                                 enableUndo = viewmodel.enableUndo,
                                 onUndo = viewmodel::undo,
                                 enableRedo = viewmodel.enableRedo,
@@ -141,8 +157,8 @@ fun NoteDetailScreen(
                         None -> {
                             TopAppBarWhenEditingNone(
                                 showNavigationIcon = showNavigationIcon,
-                                onBack = { onBackPress() },
-                                onShare = {},
+                                onBack = ::onBackPress,
+                                onShare = ::navigateToNoteShare,
                                 onChangeNoteBackground = viewmodel::toggleNoteBackgroundChangerState
                             )
                         }

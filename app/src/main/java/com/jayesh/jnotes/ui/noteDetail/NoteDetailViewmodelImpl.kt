@@ -1,13 +1,18 @@
 package com.jayesh.jnotes.ui.noteDetail
 
+import android.graphics.Bitmap
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.jayesh.jnotes.data.repository.NotesRepo
+import com.jayesh.jnotes.data.repository.fileUtility.FileHelper
 import com.jayesh.jnotes.ui.models.Note
 import com.jayesh.jnotes.ui.noteDetail.NoteDetailViewmodelImpl.Action.CREATE
 import com.jayesh.jnotes.ui.noteDetail.NoteDetailViewmodelImpl.Action.NOTHING
@@ -31,6 +36,8 @@ import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Operation.DELETE
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Operation.EQUAL
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Operation.INSERT
 import timber.log.Timber
+import java.io.File
+import java.io.FileOutputStream
 import java.util.LinkedList
 import java.util.UUID
 import javax.inject.Inject
@@ -41,6 +48,7 @@ const val UNDO_REDO_STACK_MAX_SIZE = 10
 @HiltViewModel
 class NoteDetailViewmodelImpl @Inject constructor(
     private val repo: NotesRepo,
+    private val fileHelper: FileHelper,
     savedStateHandle: SavedStateHandle
 ) : NoteDetailViewmodel() {
 
@@ -74,6 +82,8 @@ class NoteDetailViewmodelImpl @Inject constructor(
         loadNote(noteId)
         Timber.e("Init detail viewmodel")
     }
+
+    override fun getNoteId(): String = noteId ?: ""
 
     override fun loadNote(noteId: String?) {
         this.noteId = noteId
@@ -269,6 +279,24 @@ class NoteDetailViewmodelImpl @Inject constructor(
     override fun deleteNote(id: String) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.deleteNote(id)
+        }
+    }
+
+    private fun saveBitmap(name: String, bitmap: ImageBitmap): Uri? {
+        val file = File(fileHelper.getNoteScreenshotDirectory(), name)
+        val stream = FileOutputStream(file)
+        bitmap.asAndroidBitmap().compress(Bitmap.CompressFormat.JPEG, 100, stream)
+        stream.flush()
+        stream.close()
+        return fileHelper.getFileUri(file)
+    }
+
+    fun getBitmapFileUri(name: String, bitmap: ImageBitmap): Uri? {
+        return try {
+            saveBitmap(name, bitmap)
+        } catch (e: Exception) {
+            Timber.d(e, "error while saving bitmap")
+            null
         }
     }
 
