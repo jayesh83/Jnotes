@@ -31,6 +31,7 @@ import com.jayesh.jnotes.ui.theme.WhiteMutated
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Operation.DELETE
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Operation.EQUAL
@@ -44,6 +45,8 @@ import javax.inject.Inject
 
 private const val TAG = "NewOrEditNoteViewmodel"
 const val UNDO_REDO_STACK_MAX_SIZE = 10
+
+// TODO: inject dispatcher
 
 @HiltViewModel
 class NoteDetailViewmodelImpl @Inject constructor(
@@ -282,6 +285,23 @@ class NoteDetailViewmodelImpl @Inject constructor(
         }
     }
 
+    suspend fun getBitmapFileUri(name: String, bitmap: ImageBitmap): Uri? {
+        return runCatching {
+            withContext(Dispatchers.IO) {
+                deleteAllSavedScreenshotsPreviously()
+                saveBitmap(name, bitmap)
+            }
+        }.onFailure {
+            Timber.d(it, "error while saving bitmap")
+        }.getOrNull()
+    }
+
+    private suspend fun deleteAllSavedScreenshotsPreviously() {
+        withContext(Dispatchers.IO) {
+            fileHelper.getNoteScreenshotDirectory().deleteRecursively()
+        }
+    }
+
     private fun saveBitmap(name: String, bitmap: ImageBitmap): Uri? {
         val file = File(fileHelper.getNoteScreenshotDirectory(), name)
         val stream = FileOutputStream(file)
@@ -289,15 +309,6 @@ class NoteDetailViewmodelImpl @Inject constructor(
         stream.flush()
         stream.close()
         return fileHelper.getFileUri(file)
-    }
-
-    fun getBitmapFileUri(name: String, bitmap: ImageBitmap): Uri? {
-        return try {
-            saveBitmap(name, bitmap)
-        } catch (e: Exception) {
-            Timber.d(e, "error while saving bitmap")
-            null
-        }
     }
 
     private fun randomId() = UUID.randomUUID()?.toString() ?: System.currentTimeMillis().toString()

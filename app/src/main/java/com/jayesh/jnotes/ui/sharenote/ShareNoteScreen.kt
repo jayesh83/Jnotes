@@ -34,6 +34,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -55,9 +56,11 @@ import com.jayesh.jnotes.util.PlatformUtils
 import com.jayesh.jnotes.util.StringUtils
 import dev.shreyaspatil.capturable.Capturable
 import dev.shreyaspatil.capturable.controller.rememberCaptureController
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-// TODO: delete all previous screenshots before taking new one
 // TODO: share isn't working when in masterDetail UI
 
 @Composable
@@ -80,6 +83,8 @@ fun ShareNoteScreen(
 
     val launchersListHeight = remember { Constants.topAppBarHeight * 2 }
 
+    val coroutineScope = rememberCoroutineScope()
+
     val handleOnCaptured = { bitmap: ImageBitmap?, error: Throwable? ->
         if (error != null) {
             Toast.makeText(
@@ -89,12 +94,21 @@ fun ShareNoteScreen(
             ).show()
         }
         if (bitmap != null) {
-            val fileUri = noteDetailViewModel.getBitmapFileUri(
-                name = noteDetailViewModel.getNoteId() + ".jpeg",
-                bitmap = bitmap
-            )
-            if (fileUri != null)
-                PlatformUtils.shareImageOnApp(context, fileUri, selectedAppPackageName)
+            coroutineScope.launch {
+                val fileUri = noteDetailViewModel.getBitmapFileUri(
+                    name = noteDetailViewModel.getNoteId() + ".jpeg",
+                    bitmap = bitmap
+                )
+                if (fileUri != null) {
+                    PlatformUtils.shareImageOnApp(context, fileUri, selectedAppPackageName)
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Could not share",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
         }
     }
 
@@ -117,7 +131,6 @@ fun ShareNoteScreen(
                     showNavigationIcon = true,
                     rightSideContentSlot = {}
                 )
-
                 Capturable(
                     controller = captureController,
                     onCaptured = handleOnCaptured,
@@ -191,11 +204,13 @@ fun ShareableAppsList(
     val context = LocalContext.current
     var launcherAppsResolveInfo by remember { mutableStateOf(listOf<ResolveInfo>()) }
 
-    LaunchedEffect(key1 = launcherAppsResolveInfo.size) {
-        val intent = PlatformUtils.prepareJpegImageSharingIntent()
-        val launchers = PlatformUtils.listAllAppsForMatchingIntent(context, intent)
-        Timber.d(launchers.toString())
-        launcherAppsResolveInfo = launchers
+    LaunchedEffect(key1 = Unit) {
+        withContext(Dispatchers.Default) {
+            val intent = PlatformUtils.prepareJpegImageSharingIntent()
+            val launchers = PlatformUtils.listAllAppsForMatchingIntent(context, intent)
+            Timber.d(launchers.toString())
+            launcherAppsResolveInfo = launchers
+        }
     }
 
     Column(modifier = modifier) {
