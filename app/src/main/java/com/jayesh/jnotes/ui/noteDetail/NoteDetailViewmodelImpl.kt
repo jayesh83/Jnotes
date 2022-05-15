@@ -86,7 +86,7 @@ class NoteDetailViewmodelImpl @Inject constructor(
         Timber.e("Init detail viewmodel")
     }
 
-    override fun getNoteId(): String = noteId ?: ""
+    override fun getNoteId(): String? = noteId
 
     override fun loadNote(noteId: String?) {
         this.noteId = noteId

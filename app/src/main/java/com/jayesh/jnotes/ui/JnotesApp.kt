@@ -53,14 +53,30 @@ fun JnotesApp() {
                 )
             }
 
-            composable(route = Screen.NoteShare.route) { backStackEntry ->
-                val parent = remember(backStackEntry) {
-                    navController.getBackStackEntry(route = NoteEditGraph.route)
-                }
-                ShareNoteScreen(
-                    navController = navController,
-                    noteDetailViewModel = hiltViewModel(viewModelStoreOwner = parent)
+            composable(
+                route = Screen.NoteShare.route,
+                arguments = listOf(
+                    navArgument("noteId") {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    }
                 )
+            ) { backStackEntry ->
+                if (backStackEntry.arguments?.getString("noteId") != null) {
+                    ShareNoteScreen(
+                        navController = navController,
+                        noteDetailViewModel = hiltViewModel()
+                    )
+                } else {
+                    val parent = remember(backStackEntry) {
+                        navController.getBackStackEntry(route = NoteEditGraph.route)
+                    }
+                    ShareNoteScreen(
+                        navController = navController,
+                        noteDetailViewModel = hiltViewModel(viewModelStoreOwner = parent)
+                    )
+                }
             }
         }
     }
@@ -79,6 +95,10 @@ sealed class Screen(val route: String) {
 
     object NoteEdit : Screen("notes/view_or_edit?noteId={noteId}")
 
-    object NoteShare : Screen("notes/view_or_edit/share")
+    object NoteShare : Screen("notes/view_or_edit/share?noteId={noteId}"){
+        fun createRoute(noteId: String?): String {
+            return if (noteId != null) "notes/view_or_edit/share?noteId=${noteId}" else "notes/view_or_edit/share"
+        }
+    }
 }
 

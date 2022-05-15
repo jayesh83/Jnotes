@@ -63,11 +63,16 @@ fun NoteDetailScreen(
 ) {
     fun goBack() = navController.navigateUp()
 
-    fun navigateToNoteShare() {
-        navController.navigate(Screen.NoteShare.route)
+    fun navigateToNoteShare(noteId: String? = viewmodel.getNoteId()) {
+        // note: if its old note, commit any changes as we'll fetch fresh data from db in note share screen
+        // and do not commit if its new note we'll use the viewModel itself, will not fetch from db
+        if (!showingInMasterDetailUI && noteId != null) {
+            viewmodel.updateNoteIfNeeded()
+        }
+        navController.navigate(Screen.NoteShare.createRoute(noteId))
     }
 
-    fun navigateToFullScreenNoteDetail(noteId: String = viewmodel.getNoteId()) {
+    fun navigateToFullScreenNoteDetail(noteId: String? = viewmodel.getNoteId()) {
         navController.navigate(Screen.NoteEditGraph.createRoute(noteId)) {
             launchSingleTop = true
         }

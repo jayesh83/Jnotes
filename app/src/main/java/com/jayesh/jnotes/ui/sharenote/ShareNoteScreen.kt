@@ -42,10 +42,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
+import com.jayesh.jnotes.R
 import com.jayesh.jnotes.ui.noteDetail.BasicTopAppBar
 import com.jayesh.jnotes.ui.noteDetail.NoteDetailViewmodelImpl
 import com.jayesh.jnotes.ui.theme.JnotesTheme
@@ -71,8 +74,12 @@ fun ShareNoteScreen(
     LogCompositions(tag = noteDetailViewModel.hashCode().toString())
     fun goBack() = navController.navigateUp()
 
-    val title = remember { noteDetailViewModel.titleTextFieldState.text }
-    val note = remember { noteDetailViewModel.noteTextFieldState.text }
+    val title = remember(key1 = noteDetailViewModel.titleTextFieldState) {
+        noteDetailViewModel.titleTextFieldState.text
+    }
+    val note = remember(key1 = noteDetailViewModel.noteTextFieldState) {
+        noteDetailViewModel.noteTextFieldState.text
+    }
 
     val captureController = rememberCaptureController()
     val context = LocalContext.current
@@ -96,7 +103,7 @@ fun ShareNoteScreen(
         if (bitmap != null) {
             coroutineScope.launch {
                 val fileUri = noteDetailViewModel.getBitmapFileUri(
-                    name = noteDetailViewModel.getNoteId() + ".jpeg",
+                    name = noteDetailViewModel.getNoteId() ?: "jnote" + ".jpeg",
                     bitmap = bitmap
                 )
                 if (fileUri != null) {
@@ -143,7 +150,7 @@ fun ShareNoteScreen(
                         contentColor = MaterialTheme.colors.onBackground
                     ) {
                         LazyColumn(
-                            contentPadding = PaddingValues(24.dp),
+                            contentPadding = PaddingValues(32.dp),
                             verticalArrangement = Arrangement.spacedBy(24.dp)
                         ) {
                             if (title.isNotBlank()) {
@@ -158,9 +165,10 @@ fun ShareNoteScreen(
                                 item {
                                     Text(
                                         text = note,
-                                        style = MaterialTheme.typography.body1.copy(
-                                            lineHeight = 28.sp,
-                                            fontSize = 18.sp
+                                        style = MaterialTheme.typography.body2.copy(
+                                            lineHeight = 24.sp,
+                                            fontSize = 15.sp,
+                                            textAlign = TextAlign.Justify
                                         )
                                     )
                                 }
@@ -192,7 +200,10 @@ fun PoweredByJnotes(modifier: Modifier = Modifier) {
         modifier = modifier
     ) {
         Divider(color = MaterialTheme.colors.onBackground.copy(alpha = 0.2f))
-        Text(text = "Powered by Jnotes", style = MaterialTheme.typography.h6.copy(fontSize = 10.sp))
+        Text(
+            text = stringResource(R.string.powered_by_jnotes),
+            style = MaterialTheme.typography.h6.copy(fontSize = 10.sp)
+        )
     }
 }
 
