@@ -1,4 +1,4 @@
-package com.jayesh.jnotes.ui.noteDetail
+package com.jayesh.jnotes.ui.detail
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -28,10 +28,10 @@ import com.google.accompanist.insets.imePadding
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
 import com.jayesh.jnotes.ui.Screen
-import com.jayesh.jnotes.ui.noteDetail.BackgroundType.SingleColor
-import com.jayesh.jnotes.ui.noteDetail.CurrentlyEditing.None
-import com.jayesh.jnotes.ui.noteDetail.CurrentlyEditing.Note
-import com.jayesh.jnotes.ui.noteDetail.CurrentlyEditing.Title
+import com.jayesh.jnotes.ui.detail.BackgroundType.SingleColor
+import com.jayesh.jnotes.ui.detail.CurrentlyEditing.None
+import com.jayesh.jnotes.ui.detail.CurrentlyEditing.Note
+import com.jayesh.jnotes.ui.detail.CurrentlyEditing.Title
 import com.jayesh.jnotes.ui.theme.BlackMuted
 import com.jayesh.jnotes.ui.theme.Blue200
 import com.jayesh.jnotes.ui.theme.Blue500

@@ -1,4 +1,4 @@
-package com.jayesh.jnotes.ui.noteDetail
+package com.jayesh.jnotes.ui.detail
 
 import androidx.lifecycle.ViewModel
 import com.jayesh.jnotes.ui.models.Note

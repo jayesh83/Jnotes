@@ -1,4 +1,4 @@
-package com.jayesh.jnotes.ui.sharenote
+package com.jayesh.jnotes.ui.share
 
 import android.app.Activity
 import android.content.ComponentName
@@ -52,8 +52,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.jayesh.jnotes.R
-import com.jayesh.jnotes.ui.noteDetail.BasicTopAppBar
-import com.jayesh.jnotes.ui.noteDetail.NoteDetailViewmodelImpl
+import com.jayesh.jnotes.ui.detail.BasicTopAppBar
+import com.jayesh.jnotes.ui.detail.NoteDetailViewmodelImpl
 import com.jayesh.jnotes.ui.theme.JnotesTheme
 import com.jayesh.jnotes.util.Constants
 import com.jayesh.jnotes.util.LockScreenOrientation

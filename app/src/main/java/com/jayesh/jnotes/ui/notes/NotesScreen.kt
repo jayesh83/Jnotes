@@ -40,8 +40,8 @@ import com.google.accompanist.insets.statusBarsPadding
 import com.jayesh.jnotes.R
 import com.jayesh.jnotes.ui.Screen.NoteEditGraph
 import com.jayesh.jnotes.ui.models.Note
-import com.jayesh.jnotes.ui.noteDetail.NoteDetailScreen
-import com.jayesh.jnotes.ui.noteDetail.NoteDetailViewmodelImpl
+import com.jayesh.jnotes.ui.detail.NoteDetailScreen
+import com.jayesh.jnotes.ui.detail.NoteDetailViewmodelImpl
 import com.jayesh.jnotes.util.Constants
 import com.jayesh.jnotes.util.LocalWindowSize
 import com.jayesh.jnotes.util.WindowSize

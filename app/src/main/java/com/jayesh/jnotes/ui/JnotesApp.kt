@@ -13,9 +13,9 @@ import androidx.navigation.navigation
 import com.jayesh.jnotes.ui.Screen.NoteEdit
 import com.jayesh.jnotes.ui.Screen.NoteEditGraph
 import com.jayesh.jnotes.ui.Screen.Notes
-import com.jayesh.jnotes.ui.noteDetail.NoteDetailScreen
+import com.jayesh.jnotes.ui.detail.NoteDetailScreen
 import com.jayesh.jnotes.ui.notes.HomeScreen
-import com.jayesh.jnotes.ui.sharenote.ShareNoteScreen
+import com.jayesh.jnotes.ui.share.ShareNoteScreen
 
 @Composable
 fun JnotesApp() {

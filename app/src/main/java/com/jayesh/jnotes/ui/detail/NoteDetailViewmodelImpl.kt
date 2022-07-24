@@ -1,4 +1,4 @@
-package com.jayesh.jnotes.ui.noteDetail
+package com.jayesh.jnotes.ui.detail
 
 import android.graphics.Bitmap
 import android.net.Uri
@@ -14,8 +14,8 @@ import androidx.lifecycle.viewModelScope
 import com.jayesh.jnotes.data.repository.NotesRepo
 import com.jayesh.jnotes.data.repository.fileUtility.FileHelper
 import com.jayesh.jnotes.ui.models.Note
-import com.jayesh.jnotes.ui.noteDetail.NoteDetailViewmodelImpl.Action.CREATE
-import com.jayesh.jnotes.ui.noteDetail.NoteDetailViewmodelImpl.Action.NOTHING
+import com.jayesh.jnotes.ui.detail.NoteDetailViewmodelImpl.Action.CREATE
+import com.jayesh.jnotes.ui.detail.NoteDetailViewmodelImpl.Action.NOTHING
 import com.jayesh.jnotes.ui.theme.BlackMuted
 import com.jayesh.jnotes.ui.theme.Blue200
 import com.jayesh.jnotes.ui.theme.Blue500
