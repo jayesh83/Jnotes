@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -72,6 +73,7 @@ fun BasicTopAppBar(
     onBack: () -> Unit,
     backgroundColor: Color,
     contentColor: Color,
+    contentAbove: @Composable ((modifier: Modifier) -> Unit)? = null,
     rightSideContentSlot: @Composable () -> Unit
 ) {
     CompositionLocalProvider(LocalContentColor provides contentColor) {
@@ -80,25 +82,30 @@ fun BasicTopAppBar(
         } else {
             Arrangement.End
         }
-        Row(
+        Box(
             modifier = modifier
                 .background(backgroundColor)
                 .padding(start = 11.dp, end = 11.dp, top = 2.dp)
-                .height(Constants.topAppBarHeight)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = spaceBetweenOrEnd
         ) {
-            if (showNavigationIcon) {
-                IconButton(onClick = onBack, modifier = Modifier.fillMaxHeight()) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_round_back_24),
-                        contentDescription = null
-                    )
+            Row(
+                modifier = Modifier
+                    .height(Constants.topAppBarHeight)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = spaceBetweenOrEnd
+            ) {
+                if (showNavigationIcon) {
+                    IconButton(onClick = onBack, modifier = Modifier.fillMaxHeight()) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_round_back_24),
+                            contentDescription = null
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
                 }
-                Spacer(modifier = Modifier.width(8.dp))
+                rightSideContentSlot()
             }
-            rightSideContentSlot()
+            contentAbove?.invoke(modifier.align(Alignment.Center))
         }
     }
 }

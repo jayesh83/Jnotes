@@ -1,10 +1,13 @@
 package com.jayesh.jnotes.ui.sharenote
 
+import android.app.Activity
 import android.content.ComponentName
 import android.content.pm.ActivityInfo
 import android.content.pm.ResolveInfo
 import android.graphics.drawable.Drawable
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -64,8 +67,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-// TODO: share isn't working when in masterDetail UI
-
 @Composable
 fun ShareNoteScreen(
     navController: NavController,
@@ -92,6 +93,15 @@ fun ShareNoteScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
+    val shareActivityLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+        onResult = { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                goBack()
+            }
+        }
+    )
+
     val handleOnCaptured = { bitmap: ImageBitmap?, error: Throwable? ->
         if (error != null) {
             Toast.makeText(
@@ -103,11 +113,11 @@ fun ShareNoteScreen(
         if (bitmap != null) {
             coroutineScope.launch {
                 val fileUri = noteDetailViewModel.getBitmapFileUri(
-                    name = noteDetailViewModel.getNoteId() ?: "jnote" + ".jpeg",
+                    name = noteDetailViewModel.getNoteId() ?: "jnote.jpeg",
                     bitmap = bitmap
                 )
                 if (fileUri != null) {
-                    PlatformUtils.shareImageOnApp(context, fileUri, selectedAppPackageName)
+                    PlatformUtils.shareImageOnApp(fileUri, selectedAppPackageName, shareActivityLauncher)
                 } else {
                     Toast.makeText(
                         context,
@@ -136,6 +146,16 @@ fun ShareNoteScreen(
                     backgroundColor = Color.Transparent,
                     contentColor = MaterialTheme.colors.onSurface,
                     showNavigationIcon = true,
+                    contentAbove = { internalModifier ->
+                        Text(
+                            text = stringResource(R.string.share_note),
+                            style = MaterialTheme.typography.subtitle2.copy(
+                                color = MaterialTheme.colors.onBackground,
+                                textAlign = TextAlign.Center
+                            ),
+                            modifier = internalModifier
+                        )
+                    },
                     rightSideContentSlot = {}
                 )
                 Capturable(

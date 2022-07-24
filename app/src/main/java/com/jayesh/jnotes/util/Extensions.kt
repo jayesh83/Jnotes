@@ -7,10 +7,13 @@ import android.text.format.DateUtils
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.jayesh.jnotes.BuildConfig
+import com.jayesh.jnotes.ui.BaseViewModel
+import com.jayesh.jnotes.ui.State
 import timber.log.Timber
 import java.util.Calendar
 import kotlin.contracts.ExperimentalContracts
@@ -88,6 +91,15 @@ inline fun Modifier.thenIf(
         it.elseFn()
     }
 }
+
+
+/**
+ * Collects values from this ViewModel's state and represents its latest value via State.
+ * Every time there would be new value posted into the state the returned State will be
+ * updated causing recomposition of every State.value usage.
+ */
+@Composable
+fun <S : State, VM : BaseViewModel<S>> VM.collectState() = state.collectAsState()
 
 object StringUtils {
     val blankString: String get() = ""

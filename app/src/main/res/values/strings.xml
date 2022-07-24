@@ -5,4 +5,5 @@
     <string name="new_note">New note</string>
     <string name="search_notes">Search notes</string>
     <string name="powered_by_jnotes">Powered by Jnotes</string>
+    <string name="share_note">Share note</string>
 </resources>

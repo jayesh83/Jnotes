@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ResolveInfo
 import android.net.Uri
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.result.ActivityResult
 
 
 object PlatformUtils {
@@ -17,6 +19,13 @@ object PlatformUtils {
             component = componentName
         }
         context.startActivity(intent)
+    }
+
+    fun shareImageOnApp(uri: Uri, componentName: ComponentName, launcher: ManagedActivityResultLauncher<Intent, ActivityResult>) {
+        val intent = prepareJpegImageSharingIntent(uri).apply {
+            component = componentName
+        }
+        launcher.launch(intent)
     }
 
     fun prepareJpegImageSharingIntent(): Intent {

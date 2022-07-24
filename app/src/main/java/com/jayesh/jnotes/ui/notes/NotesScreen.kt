@@ -23,7 +23,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,11 +39,13 @@ import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
 import com.jayesh.jnotes.R
 import com.jayesh.jnotes.ui.Screen.NoteEditGraph
+import com.jayesh.jnotes.ui.models.Note
 import com.jayesh.jnotes.ui.noteDetail.NoteDetailScreen
 import com.jayesh.jnotes.ui.noteDetail.NoteDetailViewmodelImpl
 import com.jayesh.jnotes.util.Constants
 import com.jayesh.jnotes.util.LocalWindowSize
 import com.jayesh.jnotes.util.WindowSize
+import com.jayesh.jnotes.util.collectState
 import com.jayesh.jnotes.util.isCompact
 import com.sahu.panes.CenteredPane
 import com.sahu.panes.PaneConfig
@@ -53,11 +54,13 @@ import com.sahu.panes.TwoPane
 @Composable
 fun HomeScreen(
     navController: NavController,
-    notesViewModel: NotesViewmodelImpl,
+    notesViewModel: NotesViewmodel,
     noteDetailViewModel: NoteDetailViewmodelImpl
 ) {
+    val state by notesViewModel.collectState()
+
     val windowSizeClass = LocalWindowSize.current
-    val listState = rememberLazyListState()
+    val lazyListState = rememberLazyListState()
 
     fun navigateToNoteEdit(noteId: String) {
         navController.navigate(NoteEditGraph.createRoute(noteId)) {
@@ -72,10 +75,14 @@ fun HomeScreen(
     when (windowSizeClass) {
         WindowSize.Compact, WindowSize.Medium -> {
             NotesScreen(
-                viewmodel = notesViewModel,
+                notes = state.notes,
+                scrollToTop = state.scrollToTop,
+                onScrolledToTop = { notesViewModel.updateScrollToTop(false) },
+                searchQueryText = state.searchQueryText,
+                onSearchQueryChanged = notesViewModel::searchNotes,
                 onAddNewNote = ::navigateToCreateNewNote,
                 onEditNote = ::navigateToNoteEdit,
-                notesListState = listState
+                notesListState = lazyListState
             )
         }
         WindowSize.Expanded -> {
@@ -83,9 +90,9 @@ fun HomeScreen(
             TwoPane(
                 left = {
                     NoteList(
-                        notes = notesViewModel.notes.collectAsState().value,
+                        notes = state.notes,
                         contentPadding = PaddingValues(horizontal = 14.dp),
-                        listState = listState,
+                        listState = lazyListState,
                         onItemClick = { noteId ->
                             // we want to unselect on tap of the same selected item
                             if (selectedNoteId.value == noteId) {
@@ -94,11 +101,11 @@ fun HomeScreen(
                                 selectedNoteId.value = noteId
                             }
                         },
-                        scrollToTop = notesViewModel.scrollToTop,
+                        scrollToTop = state.scrollToTop,
                         onScrolledToTop = { notesViewModel.updateScrollToTop(false) },
                         modifier = Modifier.align(Alignment.TopStart),
-                        searchQuery = notesViewModel.searchQueryText.value,
-                        onSearchQueryChanged = { query -> notesViewModel.searchNotes(query) }
+                        searchQuery = state.searchQueryText,
+                        onSearchQueryChanged = notesViewModel::searchNotes
                     )
                     AddNewNoteFloatingActionButton(
                         modifier = Modifier
@@ -138,7 +145,11 @@ fun HomeScreen(
 
 @Composable
 fun NotesScreen(
-    viewmodel: NotesViewmodelImpl,
+    notes: List<Note>,
+    scrollToTop: Boolean,
+    onScrolledToTop: () -> Unit,
+    searchQueryText: String,
+    onSearchQueryChanged: (String) -> Unit,
     onAddNewNote: () -> Unit,
     onEditNote: (noteId: String) -> Unit,
     notesListState: LazyListState
@@ -187,17 +198,17 @@ fun NotesScreen(
                 .zIndex(1f)
         )
         NoteList(
-            notes = viewmodel.notes.collectAsState().value,
+            notes = notes,
             contentPadding = PaddingValues(horizontal = 14.dp),
             listState = notesListState,
             onItemClick = onEditNote,
-            scrollToTop = viewmodel.scrollToTop,
-            onScrolledToTop = { viewmodel.updateScrollToTop(false) },
+            scrollToTop = scrollToTop,
+            onScrolledToTop = onScrolledToTop,
             modifier = Modifier
                 .fillMaxSize()
                 .align(Alignment.TopStart),
-            searchQuery = viewmodel.searchQueryText.value,
-            onSearchQueryChanged = { query -> viewmodel.searchNotes(query) }
+            searchQuery = searchQueryText,
+            onSearchQueryChanged = onSearchQueryChanged
         )
         AddNewNoteFloatingActionButton(
             onClick = onAddNewNote,
