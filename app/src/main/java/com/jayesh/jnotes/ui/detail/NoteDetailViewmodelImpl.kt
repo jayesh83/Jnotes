@@ -13,9 +13,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.jayesh.jnotes.data.repository.NotesRepo
 import com.jayesh.jnotes.data.repository.fileUtility.FileHelper
-import com.jayesh.jnotes.ui.models.Note
 import com.jayesh.jnotes.ui.detail.NoteDetailViewmodelImpl.Action.CREATE
 import com.jayesh.jnotes.ui.detail.NoteDetailViewmodelImpl.Action.NOTHING
+import com.jayesh.jnotes.ui.models.Note
 import com.jayesh.jnotes.ui.theme.BlackMuted
 import com.jayesh.jnotes.ui.theme.Blue200
 import com.jayesh.jnotes.ui.theme.Blue500
@@ -43,8 +43,7 @@ import java.util.LinkedList
 import java.util.UUID
 import javax.inject.Inject
 
-private const val TAG = "NewOrEditNoteViewmodel"
-const val UNDO_REDO_STACK_MAX_SIZE = 10
+const val UNDO_REDO_STACK_MAX_SIZE = 50
 
 // TODO: inject dispatcher
 
@@ -57,7 +56,7 @@ class NoteDetailViewmodelImpl @Inject constructor(
 
     private var noteId: String? = null
     private var oldNote: Note? = null
-    private val isNewNote get() = oldNote == null
+    val isNewNote get() = oldNote == null
 
     var currentlyEditing by mutableStateOf(CurrentlyEditing.None) // denotes what is being edited currently. It can be title, note or none
         private set
@@ -65,6 +64,18 @@ class NoteDetailViewmodelImpl @Inject constructor(
         private set
     var noteTextFieldState by mutableStateOf(TextFieldValue(""))
         private set
+    var title by mutableStateOf("")
+        private set
+    var note by mutableStateOf("")
+        private set
+
+    private var lastCachedNote: String = ""
+
+    var historyText: String = ""
+        private set
+    var noteSetupComplete: Boolean by mutableStateOf(false)
+        private set
+
     var selectedBackgroundType by mutableStateOf(availableSingleColorBackgrounds().first())
         private set
     var noteBackgroundChangerBottomSheetVisible by mutableStateOf(false)
@@ -76,6 +87,7 @@ class NoteDetailViewmodelImpl @Inject constructor(
 
     private var stackOfUndo = mutableStateListOf<LinkedList<DiffMatchPatch.Diff>>()
     private var stackOfRedo = mutableStateListOf<LinkedList<DiffMatchPatch.Diff>>()
+    var undoOrRedoClicked by mutableStateOf(false)
 
     val enableUndo get() = stackOfUndo.size > 0
     val enableRedo get() = stackOfRedo.size > 0
@@ -98,8 +110,21 @@ class NoteDetailViewmodelImpl @Inject constructor(
                 }
             }
         } else {
-            currentlyEditing = CurrentlyEditing.Note
+            setCurrentlyEditingState(CurrentlyEditing.Note)
+            noteSetupComplete = true
         }
+    }
+
+    private fun setupNote(note: Note) {
+        this.oldNote = note
+        this.title = note.title
+        this.note = note.content.text
+        this.lastCachedNote = note.content.text
+        selectedBackgroundType = BackgroundType.SingleColor(
+            backgroundColor = note.config.backgroundColor,
+            contentColor = note.config.contentColor
+        )
+        noteSetupComplete = true
     }
 
     private fun resetStateToDefault() {
@@ -110,40 +135,22 @@ class NoteDetailViewmodelImpl @Inject constructor(
         stackOfUndo.clear()
     }
 
-    private fun setupNote(note: Note) {
-        this.oldNote = note
-        titleTextFieldState = titleTextFieldState.copy(text = note.title)
-        noteTextFieldState = noteTextFieldState.copy(
-            text = note.content.text
-        )
-        selectedBackgroundType = BackgroundType.SingleColor(
-            backgroundColor = note.config.backgroundColor,
-            contentColor = note.config.contentColor
-        )
+    fun setOnTitleChange(title: String) {
+        this.title = title
     }
 
-    fun setOnTitleChange(textFieldValue: TextFieldValue) {
-        titleTextFieldState = textFieldValue
+    fun setOnNoteChange(newNote: String) {
+        note = newNote
     }
 
-    private fun setNoteText(text: String) {
-        noteTextFieldState = noteTextFieldState.copy(text = text)
-    }
-
-    fun setOnNoteChange(textFieldValue: TextFieldValue) {
-        if (textFieldValue.text == noteTextFieldState.text) {
-            noteTextFieldState =
-                textFieldValue.copy() // when only cursor position changes, we do not want a recomposition
-            return
-        }
-        val diffs = diffMatchPatch.diffMain(
-            noteTextFieldState.text, textFieldValue.text
-        )
+    fun cacheNoteChange(newNote: String) {
+        val diffs = diffMatchPatch.diffMain(lastCachedNote, newNote)
         if (stackOfUndo.size == UNDO_REDO_STACK_MAX_SIZE) {
             stackOfUndo.removeFirst()
         }
         stackOfUndo.add(diffs)
-        noteTextFieldState = textFieldValue
+        lastCachedNote = newNote
+        Timber.d("cached: $newNote")
     }
 
     fun setCurrentlyEditingState(editingMode: CurrentlyEditing) {
@@ -160,6 +167,7 @@ class NoteDetailViewmodelImpl @Inject constructor(
     }
 
     fun undo() {
+        undoOrRedoClicked = true
         if (stackOfUndo.isNotEmpty()) {
             val diffs = stackOfUndo.removeLast()
             val stringBuilder = StringBuilder()
@@ -172,11 +180,12 @@ class NoteDetailViewmodelImpl @Inject constructor(
                 stackOfRedo.removeFirst()
             }
             stackOfRedo.add(diffs)
-            setNoteText(stringBuilder.toString())
+            historyText = stringBuilder.toString()
         }
     }
 
     fun redo() {
+        undoOrRedoClicked = true
         if (stackOfRedo.isNotEmpty()) {
             val diffs = stackOfRedo.removeLast()
             val stringBuilder = StringBuilder()
@@ -189,7 +198,7 @@ class NoteDetailViewmodelImpl @Inject constructor(
                 stackOfUndo.removeFirst()
             }
             stackOfUndo.add(diffs)
-            setNoteText(stringBuilder.toString())
+            historyText = stringBuilder.toString()
         }
     }
 
@@ -227,10 +236,10 @@ class NoteDetailViewmodelImpl @Inject constructor(
     }
 
     private val contentEmpty
-        get() = noteTextFieldState.text.isBlank()
+        get() = note.isBlank()
 
     private val titleEmpty
-        get() = titleTextFieldState.text.isBlank()
+        get() = title.isBlank()
 
     private val oldNotesColorChanged
         get() = !isNewNote && (
@@ -238,15 +247,14 @@ class NoteDetailViewmodelImpl @Inject constructor(
                         oldNote?.config?.contentColor != selectedBackgroundType.contentColor)
 
     private val oldNotesTitleChanged
-        get() = !isNewNote && oldNote?.title != titleTextFieldState.text
+        get() = !isNewNote && oldNote?.title != title
 
     private val oldNotesContentChanged
-        get() = !isNewNote && oldNote?.content?.text != noteTextFieldState.text
-
+        get() = !isNewNote && oldNote?.content?.text != note
 
     private fun getUpdatedNote() = Note(
-        title = titleTextFieldState.text,
-        content = Note.NoteContent(noteTextFieldState.text),
+        title = title,
+        content = Note.NoteContent(note),
         config = Note.NoteConfig(
             backgroundColor = selectedBackgroundType.backgroundColor,
             contentColor = selectedBackgroundType.contentColor,

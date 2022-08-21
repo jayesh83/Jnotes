@@ -29,7 +29,7 @@ public final class NoteDetailViewmodelImpl_HiltModules {
 
     @Binds
     @IntoMap
-    @StringKey("com.jayesh.jnotes.ui.noteDetail.NoteDetailViewmodelImpl")
+    @StringKey("com.jayesh.jnotes.ui.detail.NoteDetailViewmodelImpl")
     @HiltViewModelMap
     public abstract ViewModel binds(NoteDetailViewmodelImpl vm);
   }
@@ -44,7 +44,7 @@ public final class NoteDetailViewmodelImpl_HiltModules {
     @IntoSet
     @HiltViewModelMap.KeySet
     public static String provide() {
-      return "com.jayesh.jnotes.ui.noteDetail.NoteDetailViewmodelImpl";
+      return "com.jayesh.jnotes.ui.detail.NoteDetailViewmodelImpl";
     }
   }
 }
