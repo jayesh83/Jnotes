@@ -32,14 +32,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch
-import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Operation.DELETE
-import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Operation.EQUAL
-import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Operation.INSERT
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
-import java.util.LinkedList
 import java.util.UUID
 import javax.inject.Inject
 
@@ -83,10 +78,8 @@ class NoteDetailViewmodelImpl @Inject constructor(
     var forceClearCurrentFocus by mutableStateOf(false)
         private set
 
-    private val diffMatchPatch = DiffMatchPatch()
-
-    private var stackOfUndo = mutableStateListOf<LinkedList<DiffMatchPatch.Diff>>()
-    private var stackOfRedo = mutableStateListOf<LinkedList<DiffMatchPatch.Diff>>()
+    private var stackOfUndo = mutableStateListOf<History>()
+    private var stackOfRedo = mutableStateListOf<History>()
     var undoOrRedoClicked by mutableStateOf(false)
 
     val enableUndo get() = stackOfUndo.size > 0
@@ -143,12 +136,11 @@ class NoteDetailViewmodelImpl @Inject constructor(
         note = newNote
     }
 
-    fun cacheNoteChange(newNote: String) {
-        val diffs = diffMatchPatch.diffMain(lastCachedNote, newNote)
+    fun cacheNoteChange(newNote: String, someNum: Int) {
         if (stackOfUndo.size == UNDO_REDO_STACK_MAX_SIZE) {
             stackOfUndo.removeFirst()
         }
-        stackOfUndo.add(diffs)
+        stackOfUndo.add(History(newNote, newNote.length))
         lastCachedNote = newNote
         Timber.d("cached: $newNote")
     }
@@ -171,7 +163,7 @@ class NoteDetailViewmodelImpl @Inject constructor(
         if (stackOfUndo.isNotEmpty()) {
             val diffs = stackOfUndo.removeLast()
             val stringBuilder = StringBuilder()
-            diffs.forEach { change ->
+            /*diffs.forEach { change ->
                 if (change.operation == EQUAL || change.operation == DELETE) {
                     stringBuilder.append(change.text)
                 }
@@ -180,16 +172,18 @@ class NoteDetailViewmodelImpl @Inject constructor(
                 stackOfRedo.removeFirst()
             }
             stackOfRedo.add(diffs)
-            historyText = stringBuilder.toString()
+            historyText = stringBuilder.toString()*/
         }
     }
+
+    data class History(val text: String, val cursorPosition: Int)
 
     fun redo() {
         undoOrRedoClicked = true
         if (stackOfRedo.isNotEmpty()) {
             val diffs = stackOfRedo.removeLast()
             val stringBuilder = StringBuilder()
-            diffs.forEach { change ->
+            /*diffs.forEach { change ->
                 if (change.operation == EQUAL || change.operation == INSERT) {
                     stringBuilder.append(change.text)
                 }
@@ -198,7 +192,7 @@ class NoteDetailViewmodelImpl @Inject constructor(
                 stackOfUndo.removeFirst()
             }
             stackOfUndo.add(diffs)
-            historyText = stringBuilder.toString()
+            historyText = stringBuilder.toString()*/
         }
     }
 

@@ -395,9 +395,11 @@ private fun buildTitleEditText(
                 onTitleChange(editableText.toString())
             }
         }
+/*
         if (afterTextChangedDelayed != null) {
             afterTextChangedDelayed(afterTextChangedDelayed)
         }
+*/
     }
 }
 
@@ -405,7 +407,7 @@ private fun buildNoteEditText(
     context: Context,
     text: String = "",
     onNoteChange: (String) -> Unit,
-    afterTextChangedDelayed: ((String) -> Unit)? = null,
+    afterTextChangedDelayed: ((String, Int) -> Unit)? = null,
     placeholder: String,
     focusChangeListener: View.OnFocusChangeListener,
     paddingValues: Paddings,

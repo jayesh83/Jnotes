@@ -53,7 +53,7 @@ object PlatformUtils {
             .sortedWith(ResolveInfo.DisplayNameComparator(context.packageManager))
     }
 
-    fun TextView.afterTextChangedDelayed(afterTextChanged: (String) -> Unit) {
+    fun TextView.afterTextChangedDelayed(afterTextChanged: (String, Int) -> Unit) {
         addTextChangedListener(
             object : TextWatcher {
                 var timer: CountDownTimer? = null
@@ -68,7 +68,7 @@ object PlatformUtils {
                         override fun onTick(millisUntilFinished: Long) {}
                         override fun onFinish() {
                             if (hasFocus()) {
-                                afterTextChanged(editable?.toString() ?: "")
+                                afterTextChanged(editable?.toString() ?: "", 1)
                             }
                         }
                     }.start()

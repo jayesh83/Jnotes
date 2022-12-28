@@ -117,7 +117,11 @@ fun ShareNoteScreen(
                     bitmap = bitmap
                 )
                 if (fileUri != null) {
-                    PlatformUtils.shareImageOnApp(fileUri, selectedAppPackageName, shareActivityLauncher)
+                    PlatformUtils.shareImageOnApp(
+                        uri = fileUri,
+                        componentName = selectedAppPackageName,
+                        launcher = shareActivityLauncher
+                    )
                 } else {
                     Toast.makeText(
                         context,
